@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling>=1.27.0", "uv-dynamic-versioning>=0.10.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "pep440"
+bump = true
+
+[project]
+name = "robotframework-aiagent"
+version = "0.1.0"
+description = "A Robot Framework library for AI agents"
+readme = "README.md"
+authors = [{ name = "Daniel Biehl", email = "dbiehl@live.de" }]
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+
+[project.urls]
+Source = "https://github.com/d-biehl/robotframework-aiagent"
+Changelog = "https://github.com/d-biehl/robotframework-aiagent/releases"
+
+[tool.hatch.metadata.hooks.uv-dynamic-versioning]
+dependencies = [
+    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,huggingface]=={{ version }}",
+]
+
+[tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
+examples = ["robotframework-aiagent-examples=={{ version }}"]
+
+[tool.uv.sources]
+aiagent-slim = { workspace = true }
+aiagent-examples = { workspace = true }
+
+[tool.uv.workspace]
+members = ["aiagent-slim", "examples"]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["/README.md"]

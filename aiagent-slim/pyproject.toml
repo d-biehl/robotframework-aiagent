@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling>=1.27.0", "uv-dynamic-versioning>=0.10.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "pep440"
+bump = true
+
+[project]
+name = "robotframework-aiagent-slim"
+dynamic = ["version", "dependencies", "optional-dependencies"]
+description = "Robot Framework AI Agent core library"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/AIAgent"]
+
+[tool.hatch.metadata.hooks.uv-dynamic-versioning]
+dependencies = ["robotframework>=7.0", "pydantic-ai-slim>=0.7.2"]
+
+[tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
+# models
+openai = ["pydantic-ai-slim[openai]"]
+cohere = ["pydantic-ai-slim[cohere]"]
+vertexai = ["pydantic-ai-slim[vertexai]"]
+google = ["pydantic-ai-slim[google]"]
+anthropic = ["pydantic-ai-slim[anthropic]"]
+groq = ["pydantic-ai-slim[groq]"]
+mistral = ["pydantic-ai-slim[mistral]"]
+bedrock = ["pydantic-ai-slim[bedrock]"]
+huggingface = ["pydantic-ai-slim[huggingface]"]
+# tools
+duckduckgo = ["pydantic-ai-slim[duckduckgo]"]
+
+[tool.hatch.metadata]
+allow-direct-references = true

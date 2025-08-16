@@ -1389,22 +1389,36 @@ wheels = [
 
 [[package]]
 name = "robotframework-aiagent"
-version = "0.1.0"
 source = { editable = "." }
+dependencies = [
+    { name = "robotframework-aiagent-slim", extra = ["anthropic", "bedrock", "cohere", "google", "groq", "huggingface", "mistral", "openai", "vertexai"] },
+]
+
+[package.optional-dependencies]
+examples = [
+    { name = "robotframework-aiagent-examples" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "robotframework-aiagent-examples", marker = "extra == 'examples'", editable = "packages/examples" },
+    { name = "robotframework-aiagent-slim", extras = ["anthropic", "bedrock", "cohere", "google", "groq", "huggingface", "mistral", "openai", "vertexai"], editable = "packages/slim" },
+]
+provides-extras = ["examples"]
 
 [[package]]
 name = "robotframework-aiagent-examples"
-source = { editable = "examples" }
+source = { editable = "packages/examples" }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "openai"] },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "robotframework-aiagent-slim", extras = ["anthropic", "openai"], editable = "aiagent-slim" }]
+requires-dist = [{ name = "robotframework-aiagent-slim", extras = ["anthropic", "openai"], editable = "packages/slim" }]
 
 [[package]]
 name = "robotframework-aiagent-slim"
-source = { editable = "aiagent-slim" }
+source = { editable = "packages/slim" }
 dependencies = [
     { name = "pydantic-ai-slim" },
     { name = "robotframework" },

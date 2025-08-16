@@ -12,7 +12,7 @@ bump = true
 
 [project]
 name = "robotframework-aiagent"
-version = "0.1.0"
+dynamic = ["version", "dependencies", "optional-dependencies"]
 description = "A Robot Framework library for AI agents"
 readme = "README.md"
 authors = [{ name = "Daniel Biehl", email = "dbiehl@live.de" }]
@@ -32,11 +32,11 @@ dependencies = [
 examples = ["robotframework-aiagent-examples=={{ version }}"]
 
 [tool.uv.sources]
-aiagent-slim = { workspace = true }
-aiagent-examples = { workspace = true }
+robotframework-aiagent-slim = { workspace = true }
+robotframework-aiagent-examples = { workspace = true }
 
 [tool.uv.workspace]
-members = ["aiagent-slim", "examples"]
+members = ["packages/*"]
 
 [tool.hatch.build.targets.wheel]
 only-include = ["/README.md"]

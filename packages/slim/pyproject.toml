@@ -36,6 +36,3 @@ bedrock = ["pydantic-ai-slim[bedrock]"]
 huggingface = ["pydantic-ai-slim[huggingface]"]
 # tools
 duckduckgo = ["pydantic-ai-slim[duckduckgo]"]
-
-[tool.hatch.metadata]
-allow-direct-references = true

@@ -7,7 +7,19 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv*/
+
+# IDE settings
+.vscode/
+
+# Robot Framework results
+results/
 
 # playground
 playground/
+
+# macOS
+.DS_Store
+
+# robotcode
+.robot.toml

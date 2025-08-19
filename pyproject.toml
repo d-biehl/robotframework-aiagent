@@ -23,9 +23,12 @@ license = { text = "Apache-2.0" }
 Source = "https://github.com/d-biehl/robotframework-aiagent"
 Changelog = "https://github.com/d-biehl/robotframework-aiagent/releases"
 
+[dependency-groups]
+dev = ["debugpy>=1.8.16", "mypy>=1.17.1", "robotframework-robocop>=6.6.0"]
+
 [tool.hatch.metadata.hooks.uv-dynamic-versioning]
 dependencies = [
-    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,huggingface]=={{ version }}",
+    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,huggingface,mcp]=={{ version }}",
 ]
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
@@ -36,7 +39,105 @@ robotframework-aiagent-slim = { workspace = true }
 robotframework-aiagent-examples = { workspace = true }
 
 [tool.uv.workspace]
-members = ["packages/*"]
+members = ["packages/*", "examples"]
 
 [tool.hatch.build.targets.wheel]
 only-include = ["/README.md"]
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+include = [
+    "packages/**/*.py",
+    "examples/**/*.py",
+    "tests/**/*.py",
+    "docs/**/*.py",
+]
+
+[tool.ruff.lint]
+extend-select = [
+    "Q",
+    "RUF100",
+    "RUF018", # https://docs.astral.sh/ruff/rules/assignment-in-assert/
+    "C90",
+    "UP",
+    "I",
+    "D",
+    "TID251",
+]
+flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
+mccabe = { max-complexity = 15 }
+ignore = [
+    "D100", # ignore missing docstring in module
+    "D102", # ignore missing docstring in public method
+    "D104", # ignore missing docstring in public package
+    "D105", # ignore missing docstring in magic methods
+    "D107", # ignore missing docstring in __init__ methods
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["AIAgent"]
+# weird issue with ruff thinking fasta2a is still editable
+known-third-party = ["robot", "pydantic_ai"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"typing.TypedDict".msg = "Use typing_extensions.TypedDict instead."
+
+[tool.ruff.format]
+docstring-code-format = false
+quote-style = "single"
+
+[tool.ruff.lint.per-file-ignores]
+"examples/**/*.py" = ["D101", "D103"]
+"tests/**/*.py" = ["D"]
+"docs/**/*.py" = ["D"]
+
+[tool.pyright]
+pythonVersion = "3.10"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportUnnecessaryIsInstance = false
+reportUnnecessaryTypeIgnoreComment = true
+reportMissingModuleSource = false
+reportUnknownVariableType = false
+reportUntypedClassDecorator = false
+reportUnknownParameterType = false
+reportUnknownMemberType = false
+include = ["packages", "examples"]
+venvPath = '.'
+venv = ".venv"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unreachable = true
+implicit_reexport = false
+implicit_optional = true
+disallow_untyped_decorators = false
+disallow_subclassing_any = false
+explicit_package_bases = true
+namespace_packages = true
+exclude = [
+    '^\.mypy_cache/',
+    '^\.venv.*/',
+    "^build/",
+    "^dist/",
+    "^out/",
+    "^playground/",
+]
+mypy_path = ["typings", "src", "packages/slim/src"]
+
+
+[[tool.mypy.overrides]]
+module = ["robot.*"]
+ignore_missing_imports = true
+no_implicit_reexport = false

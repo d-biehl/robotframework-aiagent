@@ -21,7 +21,11 @@ requires-python = ">=3.10"
 packages = ["src/AIAgent"]
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning]
-dependencies = ["robotframework>=7.0", "pydantic-ai-slim>=0.7.2"]
+dependencies = [
+    "robotframework>=7.0",
+    "pydantic-ai-slim>=0.7.2",
+    "typing-extensions>=4.14.0",
+]
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
 # models
@@ -36,3 +40,4 @@ bedrock = ["pydantic-ai-slim[bedrock]"]
 huggingface = ["pydantic-ai-slim[huggingface]"]
 # tools
 duckduckgo = ["pydantic-ai-slim[duckduckgo]"]
+mcp = ["pydantic-ai-slim[mcp]"]

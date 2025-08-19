@@ -1,0 +1,22 @@
+ACME Ltd.
+Sample Street 12
+10115 Berlin, Germany
+
+Invoice
+Invoice Number: INV-2024-0123
+Invoice Date: 2024-07-15
+VAT ID: DE123456789
+
+Service: Annual license for QA Tool (2024-08-01 to 2025-07-31)
+Quantity: 1
+Unit Price (net): EUR 1,000.00
+
+Subtotal (net): EUR 1,000.00
+VAT (19%): EUR 190.00
+Total (gross): EUR 1,190.00
+
+Payment Terms: 14 days net
+IBAN: DE89 3704 0044 0532 0130 00
+BIC: COBADEFFXXX
+
+Note: Please include the invoice number INV-2024-0123 with your payment.

@@ -1,0 +1,24 @@
+[tool.aiagent]
+model = "gpt-4"
+
+
+[[tool.aiagent.tools]]
+name = "search"
+description = "Search the web for information"
+
+[[tool.aiagent.tools]]
+name = "calculator"
+description = "Perform calculations"
+
+
+[[tool.aiagent.tools]]
+name = "weather"
+description = "Get weather information"
+
+[[tool.aiagent.modes]]
+name = "default"
+description = "Default mode for general tasks"
+
+[[tool.aiagent.modes]]
+name = "test"
+description = "Test mode for experimental tasks"

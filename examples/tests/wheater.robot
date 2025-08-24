@@ -1,7 +1,7 @@
 *** Settings ***
-Variables       AIAgentExamples.WeatherTools
-Library         AIAgent    gpt-5-mini    toolsets=${{[$weather_toolset, $datetime_toolset]}}    AS    WheatherAgentWithTools
-Library         AIAgent    gpt-5-mini    tools=${{[$temperature_celsius, $temperature_fahrenheit]}}    AS    WheatherAgentWithToolsets
+Variables       AIAgent.Examples.WeatherTools
+Library         AIAgent.Agent    gpt-5-mini    toolsets=${{[$weather_toolset, "datetime_toolset"]}}    AS    WheatherAgentWithTools
+Library         AIAgent.Agent    gpt-5-mini    tools=${{[$temperature_celsius, $temperature_fahrenheit]}}    AS    WheatherAgentWithToolsets
 
 
 *** Test Cases ***

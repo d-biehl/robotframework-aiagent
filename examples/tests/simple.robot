@@ -1,5 +1,5 @@
 *** Settings ***
-Library         AIAgent    gpt-5-mini    name=RobotAgent
+Library     AIAgent.Agent    gpt-5-mini
 
 
 *** Test Cases ***

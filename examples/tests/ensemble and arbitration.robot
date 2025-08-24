@@ -9,9 +9,9 @@ Documentation       Demonstrates the "Ensemble and Arbitration" pattern.
 ...                 - Reading a test resource with ${CURDIR}
 
 Library             OperatingSystem
-Library             AIAgent    openai:gpt-5-nano    AS    Parser1
-Library             AIAgent    openai:gpt-4.1-nano    AS    Parser2
-Library             AIAgent    openai:gpt-5
+Library             AIAgent.Agent    openai:gpt-5-nano    AS    Parser1
+Library             AIAgent.Agent    openai:gpt-4.1-nano    AS    Parser2
+Library             AIAgent.Agent    openai:gpt-5
 ...                     output_type=${{ dataclasses.make_dataclass('Choice', [('best', int), ('reason', str)]) }}
 ...                 AS    Arbiter
 

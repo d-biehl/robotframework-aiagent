@@ -1,9 +1,7 @@
-from datetime import datetime
-
 from pydantic_ai import RunContext
 from pydantic_ai.toolsets import FunctionToolset
 
-__all__ = ['temperature_celsius', 'temperature_fahrenheit', 'weather_toolset', 'datetime_toolset']
+__all__ = ['temperature_celsius', 'temperature_fahrenheit', 'weather_toolset']
 
 
 def temperature_celsius(city: str) -> float:
@@ -14,7 +12,7 @@ def temperature_fahrenheit(city: str) -> float:
     return 69.8
 
 
-weather_toolset = FunctionToolset(tools=[temperature_celsius, temperature_fahrenheit])
+weather_toolset = FunctionToolset([temperature_celsius, temperature_fahrenheit])
 
 
 @weather_toolset.tool
@@ -23,7 +21,3 @@ def conditions(ctx: RunContext, city: str) -> str:
         return "It's sunny"
     else:
         return "It's raining"
-
-
-datetime_toolset = FunctionToolset()
-datetime_toolset.add_function(lambda: datetime.now(), name='now')

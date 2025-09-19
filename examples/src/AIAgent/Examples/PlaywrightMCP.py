@@ -1,4 +1,5 @@
 import subprocess
+import typing
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -21,7 +22,7 @@ class MCPServerStdioEx(MCPServerStdio):
         ]
     ]:
         server = StdioServerParameters(command=self.command, args=list(self.args), env=self.env, cwd=self.cwd)
-        async with stdio_client(server=server, errlog=subprocess.STDOUT) as (read_stream, write_stream):
+        async with stdio_client(server=server, errlog=typing.cast(typing.TextIO, subprocess.STDOUT)) as (read_stream, write_stream):
             yield read_stream, write_stream
 
     def __repr__(self) -> str:

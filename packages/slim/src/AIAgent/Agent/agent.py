@@ -4,7 +4,6 @@ import functools
 import importlib.metadata
 import logging
 import threading
-import warnings
 from collections.abc import Iterator, Sequence
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast, get_args
 
@@ -121,10 +120,10 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
         model_settings: settings.ModelSettings | dict[str, Any] | None = None,
         retries: int = 1,
         output_retries: int | None = None,
-        tools: list[KnownToolName | tools.Tool[Any] | tools.ToolFuncEither[Any, ...]]
+        tools: list[KnownToolName | tools.Tool[Any] | tools.ToolFuncEither]
         | KnownToolName
         | tools.Tool[Any]
-        | tools.ToolFuncEither[Any, ...]
+        | tools.ToolFuncEither
         | None = None,
         builtin_tools: list[builtin_tools.AbstractBuiltinTool] | None = None,
         toolsets: list[KnownToolsetName | toolsets.AbstractToolset]
@@ -278,52 +277,72 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
         if self._agent_loop is not None:
             return self._agent_loop
 
+        # Wait for any previous loop to shut down completely
+        if self._agent_loop_running is not None:
+            self._agent_loop_running.wait(self._LOOP_TIMEOUT)
+
+        return self._start_agent_loop()
+
+    _LOOP_TIMEOUT: float = 30.0  # Timeout for event loop operations in seconds
+
+    def _start_agent_loop(self) -> asyncio.AbstractEventLoop:
+        """Start a new agent event loop in a separate thread."""
         initialized_event = threading.Event()
         exception: Exception | None = None
 
         def agent_main() -> None:
             nonlocal exception
-
-            async def run() -> None:
-                self._agent_loop_running = threading.Event()
-                self._agent_loop = asyncio.get_event_loop()
-                self._agent_loop_stop = threading.Event()
-
-                async with self._agent:
-                    initialized_event.set()
-
-                    while not self._agent_loop_stop.is_set():
-                        await asyncio.sleep(0.0)
-
-                self._agent_loop = None
-                self._agent_thread = None
-                self._agent_loop_running.set()
-
             try:
-                asyncio.run(run())
+                asyncio.run(self._run_agent_loop(initialized_event))
             except Exception as e:
                 exception = e
                 initialized_event.set()
-                if self._agent_loop_running is not None:
-                    self._agent_loop_running.set()
+                self._cleanup_on_error()
 
-        if self._agent_loop_running is not None:
-            self._agent_loop_running.wait(30)
-
-        self._agent_thread = threading.Thread(target=agent_main)
+        self._agent_thread = threading.Thread(target=agent_main, daemon=True)
         self._agent_thread.start()
-        initialized_event.wait(30)
+
+        # Wait for initialization with timeout
+        if not initialized_event.wait(self._LOOP_TIMEOUT):
+            self._cleanup_on_error()
+            raise RuntimeError('Agent event loop initialization timed out')
 
         if exception is not None:
-            self._agent_loop = None
-            self._agent_thread = None
-
-            raise Exception(f'Failed to start agent event loop: {exception}') from exception
+            self._cleanup_on_error()
+            raise RuntimeError(f'Failed to start agent event loop: {exception}') from exception
 
         if self._agent_loop is None:
-            raise RuntimeError('Failed to initialize agent event loop')
+            self._cleanup_on_error()
+            raise RuntimeError('Agent event loop was not properly initialized')
 
         return self._agent_loop
+
+    async def _run_agent_loop(self, initialized_event: threading.Event) -> None:
+        """Run the agent event loop until stop is requested."""
+        try:
+            self._agent_loop_running = threading.Event()
+            self._agent_loop = asyncio.get_event_loop()
+            self._agent_loop_stop = threading.Event()
+
+            async with self._agent:
+                initialized_event.set()
+
+                # Keep the loop alive until stop is requested
+                while not self._agent_loop_stop.is_set():
+                    await asyncio.sleep(0.1)  # Slightly longer sleep to reduce CPU usage
+        finally:
+            # Clean up resources
+            self._agent_loop = None
+            self._agent_thread = None
+            if self._agent_loop_running is not None:
+                self._agent_loop_running.set()
+
+    def _cleanup_on_error(self) -> None:
+        """Clean up resources when an error occurs during loop initialization."""
+        self._agent_loop = None
+        self._agent_thread = None
+        if self._agent_loop_running is not None:
+            self._agent_loop_running.set()
 
     @keyword
     async def chat(
@@ -334,7 +353,7 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
         model: models.Model | KnownModelName | str | None = None,
         model_settings: settings.ModelSettings | dict[str, Any] | None = None,
         usage_limits: usage.UsageLimits | None = None,
-        usage: usage.Usage | None = None,
+        usage: usage.RunUsage | None = None,
         infer_name: bool = True,
         toolsets: Sequence[toolsets.AbstractToolset[Any]] | None = None,
         timeout: float | None = None,
@@ -372,7 +391,7 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
         model: models.Model | KnownModelName | str | None = None,
         model_settings: settings.ModelSettings | dict[str, Any] | None = None,
         usage_limits: usage.UsageLimits | None = None,
-        usage: usage.Usage | None = None,
+        usage: usage.RunUsage | None = None,
         infer_name: bool = True,
         toolsets: Sequence[toolsets.AbstractToolset[Any]] | None = None,
     ) -> output.OutputDataT | None:

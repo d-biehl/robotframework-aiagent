@@ -5,10 +5,12 @@ __all__ = ['temperature_celsius', 'temperature_fahrenheit', 'weather_toolset']
 
 
 def temperature_celsius(city: str) -> float:
+    """Get the current temperature in Celsius for a given city."""
     return 21.0
 
 
 def temperature_fahrenheit(city: str) -> float:
+    """Get the current temperature in Fahrenheit for a given city."""
     return 69.8
 
 

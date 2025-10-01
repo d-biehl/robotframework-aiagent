@@ -31,3 +31,4 @@ robotframework-aiagent-slim = { workspace = true }
 weather = "AIAgent.Examples.WeatherTools"
 datetime = "AIAgent.Examples.DateTimeTools"
 playwright_mcp = "AIAgent.Examples.PlaywrightMCP"
+image_tool = "AIAgent.Examples.ImageTool"

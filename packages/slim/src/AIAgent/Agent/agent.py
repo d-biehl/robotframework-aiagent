@@ -5,7 +5,7 @@ import importlib.metadata
 import logging
 import threading
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, Any, Generic, TypeVar, cast, get_args
+from typing import TYPE_CHECKING, Any, Generic, cast, get_args
 
 from pydantic_ai import agent, builtin_tools, messages, models, output, run, settings, tools, toolsets, usage
 from pydantic_ai.models import KnownModelName as PydanticKnownModelName
@@ -39,29 +39,26 @@ def _disable_debug_logging() -> None:
 
 _disable_debug_logging()
 
-T = TypeVar('T')
-
 
 def _get_literal_vals(alias: TypeAliasType) -> frozenset[Any]:
-    def val(alias: TypeAliasType) -> Any:
-        return alias.__value__
+    def _alias_value(a: TypeAliasType) -> Any:
+        return a.__value__
 
-    def args(alias: TypeAliasType) -> tuple[Any, ...]:
-        return get_args(val(alias))
+    def _args(a: TypeAliasType) -> tuple[Any, ...]:
+        return get_args(_alias_value(a))
 
-    def resolve(alias: TypeAliasType | tuple[T, ...] | T) -> Iterator[T]:
-        if isinstance(alias, TypeAliasType):
-            for val in resolve(args(alias)):
-                yield from resolve(val)
+    def _resolve(target: TypeAliasType | tuple[Any, ...] | Any) -> Iterator[Any]:
+        if isinstance(target, TypeAliasType):
+            for item in _resolve(_args(target)):
+                yield from _resolve(item)
             return
-        if isinstance(alias, tuple):
-            t_seq = cast(Sequence[T], alias)
-            for element in t_seq:
-                yield from resolve(element)
+        if isinstance(target, tuple):
+            for element in target:
+                yield from _resolve(element)  # pyright: ignore[reportUnknownArgumentType]
             return
-        yield alias
+        yield target
 
-    return frozenset(resolve(alias))
+    return frozenset(_resolve(alias))
 
 
 plugins_manager = PluginManager()

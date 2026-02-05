@@ -146,3 +146,16 @@ mypy_path = ["typings", "src", "packages/slim/src"]
 module = ["robot.*"]
 ignore_missing_imports = true
 no_implicit_reexport = false
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+version_scheme = "pep440"
+version_provider = "scm"
+update_changelog_on_bump = true
+major_version_zero = true
+changelog_incremental = true
+changelog_merge_prerelease = true
+gpg_sign = true
+annotated_tag = true
+bump_message = "chore(release): bump version $current_version → $new_version"

@@ -22,10 +22,10 @@ A Robot Framework library to talk to modern LLMs from your test cases and tasks.
 
 The core library is intentionally small and focused. It currently exposes:
 
-- `AIAgent.Chat` – the primary keyword to talk to LLMs (strings or typed outputs)
+- `Chat` – the primary keyword to talk to LLMs (strings or typed outputs)
 - History helpers:
-  - `AIAgent.Get Complete History`
-  - `AIAgent.Get New History`
+  - `Get Message History` (use `content=FULL|NEWEST` and `format=RAW|JSON`)
+  - `Clear Message History`
 
 The examples found under `examples/` are illustrative only; they are not project features.
 
@@ -62,6 +62,26 @@ uv pip install "robotframework-aiagent-slim[openai,mcp]"
 
 You only need to enable extras for the providers you actually plan to use.
 
+### Which package should I use?
+
+- `robotframework-aiagent`: fastest start, all providers and optional features included.
+- `robotframework-aiagent-slim[openai,mcp]`: smaller install, only the providers and features you enable.
+- Use `-slim` in CI to keep images smaller and installs faster.
+
+## Quickstart
+
+Minimal hello and per-step model override.
+
+```robot
+*** Settings ***
+Library    AIAgent.Agent    gpt-5-chat-latest
+
+*** Test Cases ***
+Say Hello
+  Chat    Hello, I am a Robot Framework test.
+  Chat    What can you do?    model=google-gla:gemini-2.5-flash-lite
+```
+
 ## Provider credentials
 
 Set the appropriate environment variables for your chosen provider(s) before running Robot. Typical variables include (non-exhaustive):
@@ -76,7 +96,26 @@ Set the appropriate environment variables for your chosen provider(s) before run
 - AWS Bedrock: standard AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, region, etc.)
 - Hugging Face: `HUGGINGFACE_API_KEY` (or a token)
 
+If you use RobotCode, you can keep these in a local .robot.toml (ignored by git) or in robot.toml and let RobotCode set them via its env section. See https://robotcode.io/02_get_started/configuration and https://robotcode.io/03_reference/config.
+
+Example .robot.toml:
+
+```toml
+[env]
+OPENAI_API_KEY = "${OPENAI_API_KEY}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY}"
+GOOGLE_API_KEY = "${GOOGLE_API_KEY}"
+```
+
 Refer to the respective provider documentation for the full and current requirements; pydantic-ai-slim follows the providers’ standard auth conventions.
+
+## Examples and guides
+
+- Quickstart guide: [docs/examples/01-quickstart.md](docs/examples/01-quickstart.md)
+- History helpers: [docs/examples/15-history-helpers.md](docs/examples/15-history-helpers.md)
+- Multi-agent patterns: [docs/examples/02-multi-agent-ping-pong.md](docs/examples/02-multi-agent-ping-pong.md)
+- Structured outputs: [docs/examples/03-structured-classification.md](docs/examples/03-structured-classification.md)
+- Example suites: [examples/tests](examples/tests)
 
 ## What you can build (use cases)
 
@@ -140,7 +179,7 @@ Within that scope, useful scenarios include:
 
 ## Roadmap / Upcoming features
 
-These are planned or potential additions based on the current design and dependencies:
+Planned or potential additions based on the current design and dependencies:
 
 - Tool-enabled agents (e.g., optional DuckDuckGo search)
 - MCP integration
@@ -163,15 +202,25 @@ These are planned or potential additions based on the current design and depende
 PRs and issues are welcome. Suggested setup:
 
 ```bash
-# Create venv and install in editable mode with dev deps
-uv pip install -e ".[dev]"
+# Sync the multi-project workspace (incl. dev groups and extras)
+uv sync --dev --all-packages --all-groups --all-extras
 
 # Lint and type-check
-ruff check . && ruff format --check .
-mypy .
+uv run ruff check . && uv run ruff format --check .
+uv run mypy .
 
 # Run example tests
-robot -d results examples/tests
+uv run robot -d results examples/tests
+```
+
+Versioning uses `uv-dynamic-versioning` (from git metadata), and releases are managed with Commitizen:
+
+```bash
+# Preview the next version without changing files
+uv run cz bump --dry-run
+
+# Create a release commit + tag
+uv run cz bump
 ```
 
 ## License and links

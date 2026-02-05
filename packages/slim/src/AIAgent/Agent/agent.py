@@ -100,7 +100,7 @@ class HistoryContent(enum.Enum):
 
 
 @library(
-    scope='SUITE',
+    scope='TEST',
     version=__version__,
     auto_keywords=True,
     listener='SELF',

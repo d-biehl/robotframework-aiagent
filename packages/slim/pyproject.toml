@@ -39,6 +39,7 @@ groq = ["pydantic-ai-slim[groq]"]
 mistral = ["pydantic-ai-slim[mistral]"]
 bedrock = ["pydantic-ai-slim[bedrock]"]
 huggingface = ["pydantic-ai-slim[huggingface]"]
+openrouter = ["pydantic-ai-slim[openrouter]"]
 # tools
 duckduckgo = ["pydantic-ai-slim[duckduckgo]"]
 mcp = ["pydantic-ai-slim[mcp]"]

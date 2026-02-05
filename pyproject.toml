@@ -24,11 +24,16 @@ Source = "https://github.com/d-biehl/robotframework-aiagent"
 Changelog = "https://github.com/d-biehl/robotframework-aiagent/releases"
 
 [dependency-groups]
-dev = ["debugpy>=1.8.16", "mypy>=1.17.1", "robotframework-robocop>=6.6.0"]
+dev = [
+    "commitizen>=4.13.5",
+    "debugpy>=1.8.16",
+    "mypy>=1.17.1",
+    "robotframework-robocop>=6.6.0",
+]
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning]
 dependencies = [
-    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,huggingface,mcp]=={{ version }}",
+    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]=={{ version }}",
 ]
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]

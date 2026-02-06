@@ -6,6 +6,12 @@ from pydantic_ai import tools as ai_tools, toolsets as ai_toolsets
 
 
 class PluginManager:
+    """Manages loading and storage of AIAgent plugins.
+
+    This class discovers and loads plugins from entry points in the 'AIAgent'
+    group, extracting tools and toolsets for use by the AIAgent library.
+    """
+
     def __init__(self) -> None:
         self._tools: dict[str, ai_tools.Tool[Any]] = {}
         self._toolsets: dict[str, ai_toolsets.AbstractToolset[Any]] = {}

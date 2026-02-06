@@ -106,6 +106,20 @@ class HistoryContent(enum.Enum):
     listener='SELF',
 )
 class Agent(HybridLibrary, Generic[output.OutputDataT]):
+    """Robot Framework Library wrapper around pydantic-ai agents.
+
+    This library exposes keywords for running model-backed chats and managing
+    message history. It is scoped to the current test and resets its last run
+    state in `end_test` to prevent cross-test leakage.
+
+    Message history defaults to `LAST_RUN`, meaning consecutive `Chat` calls in
+    the same test will continue the prior conversation unless you override it.
+
+    You can configure model settings, tools, and toolsets at construction time
+    or override them per call. The return value of `Chat` is the parsed output
+    (string or structured type) and is logged to the Robot Framework log.
+    """
+
     def __init__(
         self,
         model: models.Model | KnownModelName | str | None = None,
@@ -268,7 +282,7 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
         if self._agent_loop_running is not None:
             self._agent_loop_running.wait(30)
 
-        self._last_run_result = None
+        self.clear_message_history()
 
     def _ensure_agent_loop(self) -> asyncio.AbstractEventLoop:
         if self._agent_loop is not None:
@@ -408,7 +422,7 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
             ) as agent_run:
                 async for node in agent_run:
                     if self._robot_loop is not None:
-                        self._robot_loop.call_soon_threadsafe(logger.debug, f'Agent node: {node}')
+                        self._robot_loop.call_soon_threadsafe(logger.debug, f'Agent node: {node!r}')
                     else:
                         raise RuntimeError('Failed to log agent node')
         finally:

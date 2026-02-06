@@ -1,5 +1,5 @@
 *** Settings ***
-Library     AIAgent.Agent    gpt-5-chat-latest
+Library     AIAgent.Agent    gpt-5-chat-latest    toolsets=genimage_toolset
 
 *** Test Cases ***
 Simple Image with gpt-5-chat

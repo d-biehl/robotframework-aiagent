@@ -22,7 +22,10 @@ class MCPServerStdioEx(MCPServerStdio):
         ]
     ]:
         server = StdioServerParameters(command=self.command, args=list(self.args), env=self.env, cwd=self.cwd)
-        async with stdio_client(server=server, errlog=typing.cast(typing.TextIO, subprocess.STDOUT)) as (read_stream, write_stream):
+        async with stdio_client(server=server, errlog=typing.cast(typing.TextIO, subprocess.STDOUT)) as (
+            read_stream,
+            write_stream,
+        ):
             yield read_stream, write_stream
 
     def __repr__(self) -> str:
@@ -37,7 +40,14 @@ class MCPServerStdioEx(MCPServerStdio):
 
 playwright = MCPServerStdioEx(
     command='npx',
-    args=['@playwright/mcp@latest', '--isolated', '--image-responses', 'allow'],
+    args=[
+        '@playwright/mcp@latest',
+        '--isolated',
+        '--image-responses',
+        'allow',
+        # '--browser',
+        # 'firefox',
+    ],
     max_retries=3,
     id='playwright',
 )

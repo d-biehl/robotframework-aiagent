@@ -1,3 +1,9 @@
+## v0.2.0 (2026-02-06)
+
+### Feat
+
+- implement OpenAI model handling
+
 ## v0.1.0 (2026-02-05)
 
 ### Feat

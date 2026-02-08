@@ -13,19 +13,21 @@ A Robot Framework library to talk to modern LLMs from your test cases and tasks.
 
 ## Design goals
 
-- Keep the surface area small: one core keyword (`Chat`), predefined and user defined modes and helpers.
+- Keep the surface area small: one core keyword (`Chat`) and a few helpers.
 - Be provider-agnostic and allow per-step model switching.
 - Make typed outputs first-class to enable stable assertions in tests.
 - Keep conversations local to a test (no surprise cross-test leakage).
 
 ## Project status and scope
 
-The core library is intentionally small and focused. It currently exposes:
+The project is in an early stage (v0.2.0). The core library is intentionally small and focused. It currently exposes:
 
 - `Chat` – the primary keyword to talk to LLMs (strings or typed outputs)
 - History helpers:
   - `Get Message History` (use `content=FULL|NEWEST` and `format=RAW|JSON`)
   - `Clear Message History`
+- Tool and toolset support via pydantic-ai-slim (including MCP integration)
+- Plugin-based tool discovery via `entry_points`
 
 The examples found under `examples/` are illustrative only; they are not project features.
 
@@ -170,32 +172,22 @@ Within that scope, useful scenarios include:
   - Useful for adversarial prompts, policy reviews, or role-play testing.
   - Distribute steps across specialized agents and keep per-agent histories isolated within a test.
 
-- Mode-specific keywords
-  - Ask: question-answer turns optimized for retrieval/concise replies.
-  - Edit: prompt-driven text transforms with diff/patch style outputs.
-  - Agent: multi-step tool use and keyword calling.
-  - Verify: structured checks and validations with boolean verdicts + rationale.
-  - Custom modes: define your own keyword/mode with tailored defaults and outputs.
-
 ## Roadmap / Upcoming features
 
 Planned or potential additions based on the current design and dependencies:
 
-- Tool-enabled agents (e.g., optional DuckDuckGo search)
-- MCP integration
 - Mode-specific keywords and defaults
   - Chat (exists today), Ask, Edit, Agent, Verify, plus custom modes
   - Edit: text transforms (summarize/translate/rewrite) and patch-like outputs
   - Agent: multi-step orchestration and tool/keyword execution
   - Verify: validations with typed verdicts
   - Extensibility: define custom modes/keywords with your own defaults and outputs
-- Streaming partial responses surfaced in Robot logs during a `Chat` call
 - Configurable history storage (per test/suite) and easy transcript export/attachment to Robot reports
-- Global defaults via Robot variables and/or suite-level settings
-- Native image and multimodal inputs where supported by the provider
+- Global defaults via Robot variables, suite-level settings, and/or TOML configuration
 - Built-in convenience schemas for common structured outputs
 - Enhanced error reporting and retry policies surfaced as settings
-- Optional budget manager keywords around `usage_limits` and `usage`
+- Budget manager keywords around `usage_limits` and `usage`
+- Configurable debug logging for provider HTTP traffic
 
 ## Contributing
 

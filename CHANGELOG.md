@@ -1,3 +1,15 @@
+## v0.3.0 (2026-02-09)
+
+### Feat
+
+- implement some funtion to load content to an agent
+- add OpenRouter model and utility functions for provider handling
+- add logging for agent node processing and tool calls
+
+### Fix
+
+- improve formatting in MCPServerStdioEx and update image generation test settings
+
 ## v0.2.0 (2026-02-06)
 
 ### Feat

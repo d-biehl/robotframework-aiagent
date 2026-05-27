@@ -595,8 +595,14 @@ class AgentRunner(Generic[output.OutputDataT]):
                 async for node in agent_run:
                     await self._log_node(node, agent_run)
         finally:
+            # Persist whatever result we have (even on a partial/failed run) so message
+            # history can continue. Storing must happen here, but returning must NOT:
+            # a `return` inside `finally` would swallow any in-flight exception and let
+            # a failed run appear successful.
             if agent_run is not None and agent_run.result is not None:
                 self._last_run_result = agent_run.result
-                return agent_run.result.output
+
+        if agent_run is not None and agent_run.result is not None:
+            return agent_run.result.output
 
         return None

@@ -10,8 +10,7 @@ from robot.libraries.BuiltIn import BuiltIn
 
 def gen_image(
     prompt: str,
-    size: Literal['auto', '1024x1024', '1536x1024', '1024x1536', '256x256', '512x512', '1792x1024', '1024x1792']
-    | None = None,
+    size: Literal['auto', '1024x1024', '1536x1024', '1024x1536', '1792x1024', '1024x1792'] | None = None,
     file_name_base: str = 'output',
     n: int | None = None,
 ) -> list[str]:
@@ -19,8 +18,8 @@ def gen_image(
 
     Args:
         prompt: Natural language description of the desired image.
-        size: Optional image size. If ``NOT_GIVEN`` the provider's default is used. Allowed values:
-            'auto', '1024x1024', '1536x1024', '1024x1536', '256x256', '512x512', '1792x1024', '1024x1792'.
+        size: Optional image size. If ``None``, ``'auto'`` lets the model choose. Allowed values:
+            'auto', '1024x1024', '1536x1024', '1024x1536', '1792x1024', '1024x1792'.
         file_name_base: Base name for the output files. Each generated image is saved as
             ``{file_name_base}_{index}.png`` in the current working directory.
         n: Optional number of images to generate. If ``None`` the provider's default is used.
@@ -32,11 +31,11 @@ def gen_image(
         ValueError: If the API response contains no image data or an item lacks ``b64_json`` content.
 
     Example:
-        >>> gen_image("Minimal blue square logo", size="512x512", file_name_base="logo")
+        >>> gen_image("Minimal blue square logo", size="1024x1024", file_name_base="logo")
         ['logo_0.png']
     """
     with OpenAI() as client:
-        resp = client.images.generate(prompt=prompt, model='gpt-image-2', size='auto', output_format='png', n=n)
+        resp = client.images.generate(prompt=prompt, model='gpt-image-2', size=size or 'auto', output_format='png', n=n)
 
     if not resp.data:
         raise ValueError('No image data returned from OpenAI')

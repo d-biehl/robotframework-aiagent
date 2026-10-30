@@ -7,8 +7,9 @@ Verify That Passes
     Verify That    The invoice total is 199.00 EUR.    nennt einen Gesamtpreis in EUR
 
 Verify That Fails
-    [Documentation]    Demonstrates a failing verification (expected to fail).
-    Verify That    The weather is nice today.    nennt einen Gesamtpreis in EUR
+    [Documentation]    Demonstrates a failing verification by asserting the expected failure.
+    Run Keyword And Expect Error    Verification failed*
+    ...    Verify That    The weather is nice today.    nennt einen Gesamtpreis in EUR
 
 Inspect A Verdict Without Failing
     ${verdict}=    Get Verdict    Hallo, schön dich zu sehen!    ist eine höfliche Begrüßung

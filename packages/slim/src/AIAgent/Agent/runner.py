@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from pydantic_ai.result import FinalResult
     from pydantic_graph import End
 
+import pydantic_ai
 from pydantic_ai import (
     FilePart,
     FinalResultEvent,
@@ -61,6 +62,9 @@ def _disable_debug_logging() -> None:
 
 
 _disable_debug_logging()
+
+# Robot Framework owns the console, keep pydantic-ai's first-run banner out of it
+pydantic_ai.BANNER_ENABLED = False
 
 
 def _get_literal_vals(alias: TypeAliasType) -> frozenset[Any]:

@@ -201,8 +201,8 @@ uv sync --dev --all-packages --all-groups --all-extras
 uv run ruff check . && uv run ruff format --check .
 uv run mypy .
 
-# Run example tests
-uv run robot -d results examples/tests
+# Run example tests (paths and output dir come from robot.toml, API keys from your .robot.toml)
+uv run --all-packages robotcode run
 ```
 
 All workspace packages share one static version (set in each `pyproject.toml`) and pin each other exactly.

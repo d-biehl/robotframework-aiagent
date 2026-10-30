@@ -1,3 +1,6 @@
+paths = ["examples/tests"]
+output-dir = "results"
+
 [tool.aiagent]
 model = "gpt-4"
 

@@ -15,6 +15,9 @@ wheels/
 # Robot Framework results
 results/
 
+# Playwright MCP server output (console logs, page snapshots)
+.playwright-mcp/
+
 # playground
 playground/
 

@@ -33,7 +33,7 @@ Help AI coding agents work productively in this repo by capturing how it’s str
 ### Typical commands (zsh)
 - Install (editable dev): uv/pip against root with provider extras in the meta package.
 - Lint/type: ruff check/format, pyright, mypy.
-- Run examples: `robot -d results examples/tests`.
+- Run examples: `uv run --all-packages robotcode run` (configured in `robot.toml`).
 
 ### Integration notes
 - Providers and tools come from pydantic-ai-slim. Ensure API keys/environment are set (e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.) before running Robot.

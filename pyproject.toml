@@ -27,6 +27,7 @@ dev = [
     "commitizen>=4.19.3",
     "debugpy>=1.8.22",
     "mypy>=2.4.1",
+    "robotcode[runner]>=2.8.0",
     "robotframework-robocop>=9.1.2",
     "ruff>=0.17.3",
 ]

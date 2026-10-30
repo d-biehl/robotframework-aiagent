@@ -20,23 +20,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
+      # setup-uv no longer publishes major tags, the uv version comes from `required-version` in pyproject.toml
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.3.3
 
       - name: Set up Python
         run: uv python install
 
-      - name: Install the project
-        run: uv sync --dev --all-groups --all-extras --all-packages
-        
+      - name: Check that the release tag matches the project version
+        run: |
+          uv lock --locked
+          version="v$(uv version --short)"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Release tag $GITHUB_REF_NAME does not match project version $version"
+            exit 1
+          fi
+
       - name: Build release distributions
         run: |
           uv build --all-packages
 
       - name: Upload distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-dists
           path: dist/
@@ -59,7 +66,7 @@ jobs:
 
     steps:
       - name: Retrieve release distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release-dists
           path: dist/

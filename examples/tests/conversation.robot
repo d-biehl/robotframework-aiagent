@@ -4,14 +4,15 @@ Documentation       Two agents converse and end it autonomously via SemanticAgen
 Library             Collections
 Library             AIAgent.Agent    gpt-5    instructions=${PERSON1_INSTRUCTIONS}    AS    Person1
 Library             AIAgent.Agent    claude-sonnet-4-0    instructions=${PERSON2_INSTRUCTIONS}    AS    Person2
-Library             AIAgent.Agent    gpt-5-mini
-...                     instructions=${SEMANTIC_AGENT_INSTRUCTIONS}
-...                     output_type=${{dataclasses.make_dataclass('Result', [('should_break', bool), ('reason', str)])}}
-...                 AS    SemanticAgent
+Library    AIAgent.Agent
+...    gpt-5-mini
+...    instructions=${SEMANTIC_AGENT_INSTRUCTIONS}
+...    output_type=${{dataclasses.make_dataclass('Result', [('should_break', bool), ('reason', str)])}}
+...    AS    SemanticAgent
 
 
 *** Variables ***
-${LANGUAGE}                         German
+${LANGUAGE}                         English
 
 @{DIALOGUE_COMMON}
 ...                                 Speak in ${LANGUAGE}. Write in Markdown with a book-like style.

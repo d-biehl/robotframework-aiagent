@@ -2,18 +2,18 @@
 Variables       AIAgent.Models.OpenAI
 Variables       AIAgent.Models.OpenRouter
 Variables       AIAgent.Content
+# Library         AIAgent.Agent    openrouter:anthropic/claude-sonnet-4.5
 Library         AIAgent.Agent    ${OpenAIResponsesModel("${OPENAI_MODEL_GPT_5_2_PRO}")}
-...                 toolsets=playwright
 ...                 model_settings=${OPENAI_MODEL_SETTINGS}
-# Library    AIAgent.Agent    ${OpenRouterModel("moonshotai/kimi-k2.5")}
-# ...    toolsets=playwright
-# Library    AIAgent.Agent    anthropic:claude-sonnet-4-5
-# ...    toolsets=playwright
+# Library       AIAgent.Agent    ${OpenRouterModel("z-ai/glm-4.7")}
+# Library       AIAgent.Agent    anthropic:claude-sonnet-4-5
+# Library       AIAgent.Agent    github:openai/gpt-4.1
+# Library       AIAgent.Agent    ollama:glm-4.7-flash:latest
+...                 toolsets=${{["weather_toolset", "playwright"]}}
 
 
 *** Variables ***
 &{OPENAI_MODEL_SETTINGS}
-...                         openai_reasoning_effort=high
 ...                         openai_response_format=verbose
 ...                         openai_reasoning_summary=detailed
 ...                         openai_chat_send_back_thinking_parts=field
@@ -22,6 +22,7 @@ Library         AIAgent.Agent    ${OpenAIResponsesModel("${OPENAI_MODEL_GPT_5_2_
 *** Test Cases ***
 simple hello
     Chat    Hello, who are you? And who am I?
+    Chat    Wich tools do you have access to?
 
 second
     Chat    What is the weather like in Berlin today?

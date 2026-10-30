@@ -4,8 +4,8 @@ Two agents talking to each other via aliases.
 
 ```robot
 *** Settings ***
-Library    AIAgent    openai:gpt-5-chat-latest
-Library    AIAgent    anthropic:claude-sonnet-4-0    AS    SecondAgent
+Library    AIAgent    openai:gpt-5.4-mini
+Library    AIAgent    anthropic:claude-sonnet-5-5    AS    SecondAgent
 
 *** Test Cases ***
 Ping Pong

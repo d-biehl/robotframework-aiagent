@@ -76,7 +76,7 @@ Minimal hello and per-step model override.
 
 ```robot
 *** Settings ***
-Library    AIAgent.Agent    openai:gpt-5-chat-latest
+Library    AIAgent.Agent    openai:gpt-5.4-mini
 
 *** Test Cases ***
 Say Hello

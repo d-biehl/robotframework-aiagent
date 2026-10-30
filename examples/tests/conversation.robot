@@ -3,7 +3,7 @@ Documentation       Two agents converse and end it autonomously via SemanticAgen
 
 Library             Collections
 Library             AIAgent.Agent    openai:gpt-5    instructions=${PERSON1_INSTRUCTIONS}    AS    Person1
-Library             AIAgent.Agent    anthropic:claude-sonnet-4-0    instructions=${PERSON2_INSTRUCTIONS}    AS    Person2
+Library             AIAgent.Agent    anthropic:claude-sonnet-5-5    instructions=${PERSON2_INSTRUCTIONS}    AS    Person2
 Library    AIAgent.Agent
 ...    openai:gpt-5-mini
 ...    instructions=${SEMANTIC_AGENT_INSTRUCTIONS}

@@ -9,5 +9,5 @@ Say Hello
     ${messages}    Get Message History
     Log    ${messages}
 
-    ${messages}    Get Message History    JSON
+    ${messages}    Get Message History    format=JSON
     Log    ${messages}

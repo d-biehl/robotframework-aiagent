@@ -1,34 +1,23 @@
 [build-system]
-requires = ["hatchling>=1.27.0", "uv-dynamic-versioning>=0.10.0"]
-build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "uv-dynamic-versioning"
-
-[tool.uv-dynamic-versioning]
-vcs = "git"
-style = "pep440"
-bump = true
-fallback-version = "0.0.0"
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
 
 [project]
 name = "robotframework-aiagent-examples"
-dynamic = ["version", "dependencies", "optional-dependencies"]
+version = "0.3.0"
 description = "robotframework-aiagent examples"
 readme = "README.md"
 requires-python = ">=3.10"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/AIAgent"]
-
-[tool.hatch.metadata.hooks.uv-dynamic-versioning]
-dependencies = ["robotframework-aiagent-slim[openai,anthropic]=={{ version }}"]
-
-[tool.uv.sources]
-robotframework-aiagent-slim = { workspace = true }
+dependencies = ["robotframework-aiagent-slim[openai,anthropic]==0.3.0"]
 
 [project.entry-points.AIAgent]
 weather = "AIAgent.Examples.WeatherTools"
 datetime = "AIAgent.Examples.DateTimeTools"
 playwright_mcp = "AIAgent.Examples.PlaywrightMCP"
 image_tool = "AIAgent.Examples.ImageTool"
+
+[tool.uv.sources]
+robotframework-aiagent-slim = { workspace = true }
+
+[tool.uv.build-backend]
+module-name = "AIAgent.Examples"

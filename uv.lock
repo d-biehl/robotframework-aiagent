@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -24,7 +24,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "caio", marker = "python_full_version < '3.11'" },
+    { name = "caio" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/67/e2/d7cb819de8df6b5c1968a2756c3cb4122d4fa2b8fc768b53b7c9e5edb646/aiofile-3.9.0.tar.gz", hash = "sha256:e5ad718bb148b265b6df1b3752c4d1d83024b93da9bd599df74b9d9ffcf7919b", size = 17943, upload-time = "2024-10-08T10:39:35.846Z" }
 wheels = [
@@ -41,7 +41,7 @@ resolution-markers = [
     "python_full_version >= '3.11' and python_full_version < '3.13'",
 ]
 dependencies = [
-    { name = "caio", marker = "python_full_version >= '3.11'" },
+    { name = "caio" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/48/41/2fea7e193e061ce54eacc3b7bc0e6a99e4fcff43c78cf0a76dd781ed8334/aiofile-3.11.1.tar.gz", hash = "sha256:1f91912c6643d2a4e49ca4ae3514f0bf3867ce948a36d99a6411b8f4755f4cf9", size = 19342, upload-time = "2026-05-16T08:18:33.538Z" }
 wheels = [
@@ -2642,6 +2642,7 @@ wheels = [
 
 [[package]]
 name = "robotframework-aiagent"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "bedrock", "cohere", "google", "groq", "mcp", "mistral", "openai", "openrouter", "vertexai"] },
@@ -2663,7 +2664,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "robotframework-aiagent-examples", marker = "extra == 'examples'", editable = "examples" },
-    { name = "robotframework-aiagent-slim", extras = ["anthropic", "bedrock", "cohere", "google", "groq", "mcp", "mistral", "openai", "openrouter", "vertexai"], editable = "packages/slim" },
+    { name = "robotframework-aiagent-slim", extras = ["openai", "vertexai", "google", "groq", "anthropic", "mistral", "cohere", "bedrock", "openrouter", "mcp"], editable = "packages/slim" },
 ]
 provides-extras = ["examples"]
 
@@ -2677,16 +2678,18 @@ dev = [
 
 [[package]]
 name = "robotframework-aiagent-examples"
+version = "0.3.0"
 source = { editable = "examples" }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "openai"] },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "robotframework-aiagent-slim", extras = ["anthropic", "openai"], editable = "packages/slim" }]
+requires-dist = [{ name = "robotframework-aiagent-slim", extras = ["openai", "anthropic"], editable = "packages/slim" }]
 
 [[package]]
 name = "robotframework-aiagent-slim"
+version = "0.3.0"
 source = { editable = "packages/slim" }
 dependencies = [
     { name = "pydantic-ai-slim" },
@@ -2750,10 +2753,11 @@ requires-dist = [
     { name = "robotframework", specifier = ">=7.0" },
     { name = "typing-extensions", specifier = ">=4.14.0" },
 ]
-provides-extras = ["anthropic", "bedrock", "cohere", "duckduckgo", "google", "groq", "huggingface", "mcp", "mistral", "openai", "openrouter", "vertexai"]
+provides-extras = ["openai", "cohere", "vertexai", "google", "anthropic", "groq", "mistral", "bedrock", "huggingface", "openrouter", "duckduckgo", "mcp"]
 
 [[package]]
 name = "robotframework-aiagent-verify"
+version = "0.3.0"
 source = { editable = "packages/verify" }
 dependencies = [
     { name = "robotframework-aiagent-slim" },

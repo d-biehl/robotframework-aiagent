@@ -205,7 +205,8 @@ uv run mypy .
 uv run robot -d results examples/tests
 ```
 
-Versioning uses `uv-dynamic-versioning` (from git metadata), and releases are managed with Commitizen:
+All workspace packages share one static version (set in each `pyproject.toml`) and pin each other exactly.
+Releases are managed with Commitizen, which bumps all packages, their pins and `uv.lock` in one go:
 
 ```bash
 # Preview the next version without changing files

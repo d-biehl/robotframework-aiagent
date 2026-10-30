@@ -26,7 +26,7 @@ Help AI coding agents work productively in this repo by capturing how it’s str
 - Logging: final model output is written via `robot.api.logger.info`; keep this behavior for visibility in logs/reports.
 
 ### Local dev workflow
-- Python 3.10+; uses uv + hatch dynamic versioning; workspace members: `packages/*`, `examples`.
+- Python 3.10+; uses uv with the `uv_build` backend and static versions kept in sync by Commitizen; workspace members: `packages/*`, `examples`.
 - Install dev deps: editable root with extras as needed; run linters and type-checkers defined in `pyproject.toml` (ruff, pyright, mypy).
 - Quick smoke: run example suites and inspect `results/`.
 

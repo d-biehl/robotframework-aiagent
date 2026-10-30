@@ -1,23 +1,22 @@
 [build-system]
-requires = ["hatchling>=1.27.0", "uv-dynamic-versioning>=0.10.0"]
-build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "uv-dynamic-versioning"
-
-[tool.uv-dynamic-versioning]
-vcs = "git"
-style = "pep440"
-bump = true
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
 
 [project]
 name = "robotframework-aiagent"
-dynamic = ["version", "dependencies", "optional-dependencies"]
+version = "0.3.0"
 description = "A Robot Framework library for AI agents"
 readme = "README.md"
 authors = [{ name = "Daniel Biehl", email = "dbiehl@live.de" }]
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+dependencies = [
+    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]==0.3.0",
+]
+
+[project.optional-dependencies]
+examples = ["robotframework-aiagent-examples==0.3.0"]
 
 [project.urls]
 Source = "https://github.com/d-biehl/robotframework-aiagent"
@@ -31,13 +30,8 @@ dev = [
     "robotframework-robocop>=6.6.0",
 ]
 
-[tool.hatch.metadata.hooks.uv-dynamic-versioning]
-dependencies = [
-    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]=={{ version }}",
-]
-
-[tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
-examples = ["robotframework-aiagent-examples=={{ version }}"]
+[tool.uv]
+required-version = ">=0.13.6"
 
 [tool.uv.sources]
 robotframework-aiagent-slim = { workspace = true }
@@ -46,8 +40,9 @@ robotframework-aiagent-examples = { workspace = true }
 [tool.uv.workspace]
 members = ["packages/*", "examples"]
 
-[tool.hatch.build.targets.wheel]
-only-include = ["/README.md"]
+[tool.uv.build-backend]
+# meta package: no Python modules, only metadata and dependencies
+module-name = []
 
 
 [tool.ruff]
@@ -151,7 +146,17 @@ no_implicit_reexport = false
 name = "cz_conventional_commits"
 tag_format = "v$version"
 version_scheme = "pep440"
-version_provider = "scm"
+version_provider = "uv"
+# all workspace packages share one version and pin each other exactly
+version_files = [
+    "packages/slim/pyproject.toml:^version",
+    "packages/verify/pyproject.toml:^version",
+    "examples/pyproject.toml:^version",
+    "pyproject.toml:robotframework-aiagent-.*==",
+    "examples/pyproject.toml:robotframework-aiagent-slim.*==",
+    "packages/verify/pyproject.toml:robotframework-aiagent-slim.*==",
+]
+pre_bump_hooks = ["uv lock"]
 update_changelog_on_bump = true
 major_version_zero = true
 changelog_incremental = true

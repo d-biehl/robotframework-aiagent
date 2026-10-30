@@ -1,29 +1,18 @@
 [build-system]
-requires = ["hatchling>=1.27.0", "uv-dynamic-versioning>=0.10.0"]
-build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "uv-dynamic-versioning"
-
-[tool.uv-dynamic-versioning]
-vcs = "git"
-style = "pep440"
-bump = true
-fallback-version = "0.0.0"
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
 
 [project]
 name = "robotframework-aiagent-verify"
-dynamic = ["version", "dependencies"]
+version = "0.3.0"
 description = "LLM-as-judge verification keywords for robotframework-aiagent"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/AIAgent"]
-
-[tool.hatch.metadata.hooks.uv-dynamic-versioning]
-dependencies = ["robotframework-aiagent-slim=={{ version }}"]
+license = "Apache-2.0"
+dependencies = ["robotframework-aiagent-slim==0.3.0"]
 
 [tool.uv.sources]
 robotframework-aiagent-slim = { workspace = true }
+
+[tool.uv.build-backend]
+module-name = "AIAgent.Verify"

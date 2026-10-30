@@ -1,34 +1,21 @@
 [build-system]
-requires = ["hatchling>=1.27.0", "uv-dynamic-versioning>=0.10.0"]
-build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "uv-dynamic-versioning"
-
-[tool.uv-dynamic-versioning]
-vcs = "git"
-style = "pep440"
-bump = true
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
 
 [project]
 name = "robotframework-aiagent-slim"
-dynamic = ["version", "dependencies", "optional-dependencies"]
+version = "0.3.0"
 description = "Robot Framework AI Agent core library"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/AIAgent"]
-
-[tool.hatch.metadata.hooks.uv-dynamic-versioning]
+license = "Apache-2.0"
 dependencies = [
     "robotframework>=7.0",
     "pydantic-ai-slim>=1.103.0",
     "typing-extensions>=4.14.0",
 ]
 
-[tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
+[project.optional-dependencies]
 # models
 openai = ["pydantic-ai-slim[openai]"]
 cohere = ["pydantic-ai-slim[cohere]"]
@@ -43,3 +30,9 @@ openrouter = ["pydantic-ai-slim[openrouter]"]
 # tools
 duckduckgo = ["pydantic-ai-slim[duckduckgo]"]
 mcp = ["pydantic-ai-slim[mcp]"]
+
+[tool.uv.build-backend]
+# AIAgent is a namespace package shared with the other workspace members
+# (AIAgent/Models has no __init__.py either), so ship the whole tree as is
+module-name = "AIAgent"
+namespace = true

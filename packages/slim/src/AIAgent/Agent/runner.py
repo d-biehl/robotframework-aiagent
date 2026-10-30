@@ -15,8 +15,6 @@ if TYPE_CHECKING:
 from pydantic_ai import (
     FilePart,
     FinalResultEvent,
-    FunctionToolCallEvent,
-    FunctionToolResultEvent,
     NativeToolCallPart,
     NativeToolReturnPart,
     PartDeltaEvent,
@@ -24,6 +22,8 @@ from pydantic_ai import (
     PartStartEvent,
     TextPart,
     ThinkingPart,
+    ToolCallEvent,
+    ToolResultEvent,
     agent,
     capabilities,
     messages,
@@ -408,12 +408,13 @@ class AgentRunner(Generic[output.OutputDataT]):
         async with stream_method(agent_run.ctx) as tool_stream:
             async for event in tool_stream:
                 match event:
-                    case FunctionToolCallEvent():
+                    # base classes, so output tools (separate events since pydantic-ai v2) are logged too
+                    case ToolCallEvent():
                         self._robot_loop.call_soon_threadsafe(
                             logger.debug,
                             f'Tool call: {event.part.tool_name}({event.part.args}) [id={event.part.tool_call_id}]',
                         )
-                    case FunctionToolResultEvent():
+                    case ToolResultEvent():
                         self._robot_loop.call_soon_threadsafe(
                             logger.debug,
                             f'Tool result [{event.tool_call_id}]: {event.part.content}',

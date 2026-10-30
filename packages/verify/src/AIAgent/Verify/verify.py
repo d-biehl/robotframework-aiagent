@@ -60,9 +60,10 @@ class Verify:
     configured to return a structured `Verdict`. Use `Verify That` for fail-fast
     assertions and `Get Verdict` to inspect the verdict without failing the test.
 
-    The judge defaults to deterministic decoding (temperature 0) unless you pass
-    your own `model_settings`. Each verification is evaluated independently; no
-    conversation history is shared between calls.
+    Each verification is evaluated independently; no conversation history is
+    shared between calls. For more stable verdicts with a model that accepts
+    sampling settings, pass e.g. `model_settings={'temperature': 0}`; reasoning
+    models such as `gpt-5` do not accept them.
     """
 
     def __init__(
@@ -74,16 +75,12 @@ class Verify:
         confidence_threshold: float = 0.0,
         retries: int = 1,
     ):
-        # Default to deterministic judging unless the caller overrides settings.
-        resolved_settings: settings.ModelSettings | dict[str, Any]
-        resolved_settings = {'temperature': 0.0} if model_settings is None else model_settings
-
         self._confidence_threshold = confidence_threshold
         self._runner: AgentRunner[Verdict] = AgentRunner(
             model,
             output_type=Verdict,
             instructions=instructions if instructions is not None else _DEFAULT_INSTRUCTIONS,
-            model_settings=resolved_settings,
+            model_settings=model_settings,
             retries=retries,
         )
 

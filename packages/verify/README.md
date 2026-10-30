@@ -23,5 +23,9 @@ Invoice Has Total
 
 A `Verdict` carries `passed`, `confidence`, `rationale` and `violations`.
 
+For more stable verdicts with a model that accepts sampling settings, pass them when
+importing the library, e.g. `model_settings={'temperature': 0}`. Reasoning models such
+as `gpt-5` do not accept them.
+
 This is an optional plugin built on top of `robotframework-aiagent-slim`; install the
 slim package with the provider extras you need (e.g. `[openai]`).

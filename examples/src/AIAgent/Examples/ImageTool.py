@@ -15,7 +15,7 @@ def gen_image(
     file_name_base: str = 'output',
     n: int | None = None,
 ) -> list[str]:
-    """Generate one or more images with the OpenAI `gpt-image-1` model and save them as PNG files.
+    """Generate one or more images with the OpenAI `gpt-image-2` model and save them as PNG files.
 
     Args:
         prompt: Natural language description of the desired image.
@@ -36,7 +36,7 @@ def gen_image(
         ['logo_0.png']
     """
     with OpenAI() as client:
-        resp = client.images.generate(prompt=prompt, model='gpt-image-1', size='auto', output_format='png', n=n)
+        resp = client.images.generate(prompt=prompt, model='gpt-image-2', size='auto', output_format='png', n=n)
 
     if not resp.data:
         raise ValueError('No image data returned from OpenAI')

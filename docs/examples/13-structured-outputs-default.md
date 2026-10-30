@@ -4,7 +4,7 @@ Default typed schema at import; simple call.
 
 ```robot
 *** Settings ***
-Library    AIAgent    gpt-5-nano
+Library    AIAgent    openai:gpt-5-nano
 ...        output_type=${{ dataclasses.make_dataclass('Result', [('should_break', bool), ('reason', str)]) }}
 ...        AS    SemanticAgent
 

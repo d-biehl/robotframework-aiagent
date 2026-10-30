@@ -2,10 +2,10 @@
 Documentation       Two agents converse and end it autonomously via SemanticAgent.
 
 Library             Collections
-Library             AIAgent.Agent    gpt-5    instructions=${PERSON1_INSTRUCTIONS}    AS    Person1
-Library             AIAgent.Agent    claude-sonnet-4-0    instructions=${PERSON2_INSTRUCTIONS}    AS    Person2
+Library             AIAgent.Agent    openai:gpt-5    instructions=${PERSON1_INSTRUCTIONS}    AS    Person1
+Library             AIAgent.Agent    anthropic:claude-sonnet-4-0    instructions=${PERSON2_INSTRUCTIONS}    AS    Person2
 Library    AIAgent.Agent
-...    gpt-5-mini
+...    openai:gpt-5-mini
 ...    instructions=${SEMANTIC_AGENT_INSTRUCTIONS}
 ...    output_type=${{dataclasses.make_dataclass('Result', [('should_break', bool), ('reason', str)])}}
 ...    AS    SemanticAgent

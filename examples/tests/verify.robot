@@ -1,5 +1,5 @@
 *** Settings ***
-Library    AIAgent.Verify    gpt-5-mini
+Library    AIAgent.Verify    openai:gpt-5-mini
 
 
 *** Test Cases ***

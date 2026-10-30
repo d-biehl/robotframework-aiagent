@@ -22,11 +22,11 @@ Help AI coding agents work productively in this repo by capturing how it’s str
 ### Conventions and patterns
 - Multi-agent: import `AIAgent` multiple times with `AS` to isolate roles; each agent holds its own last-run history within the test.
 - Typed outputs: prefer `output_type` (e.g., dataclasses) for stable assertions in Robot.
-- Known model names: `KnownModelName` mirrors pydantic-ai-slim’s known models; you can also pass plain strings like `google-gla:gemini-2.5-flash-lite`.
+- Known model names: `KnownModelName` mirrors pydantic-ai-slim’s known models; you can also pass plain strings like `google:gemini-2.5-flash-lite`.
 - Logging: final model output is written via `robot.api.logger.info`; keep this behavior for visibility in logs/reports.
 
 ### Local dev workflow
-- Python 3.10+; uses uv with the `uv_build` backend and static versions kept in sync by Commitizen; workspace members: `packages/*`, `examples`.
+- Python 3.11+; uses uv with the `uv_build` backend and static versions kept in sync by Commitizen; workspace members: `packages/*`, `examples`.
 - Install dev deps: editable root with extras as needed; run linters and type-checkers defined in `pyproject.toml` (ruff, pyright, mypy).
 - Quick smoke: run example suites and inspect `results/`.
 

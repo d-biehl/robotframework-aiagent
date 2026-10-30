@@ -7,8 +7,8 @@ name = "robotframework-aiagent-examples"
 version = "0.3.0"
 description = "robotframework-aiagent examples"
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = ["robotframework-aiagent-slim[openai,anthropic]==0.3.0"]
+requires-python = ">=3.11"
+dependencies = ["robotframework-aiagent-slim[openai,anthropic,mcp]==0.3.0"]
 
 [project.entry-points.AIAgent]
 weather = "AIAgent.Examples.WeatherTools"

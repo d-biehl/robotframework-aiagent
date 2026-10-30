@@ -1,5 +1,5 @@
 *** Settings ***
-Library     AIAgent.Agent    gpt-5-mini
+Library     AIAgent.Agent    openai:gpt-5-mini
 
 
 *** Test Cases ***

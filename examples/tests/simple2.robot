@@ -5,7 +5,7 @@ Library     AIAgent.Agent
 *** Test Cases ***
 Say Hello
     # AIAgent.Chat    Hello, I am a Robot Framework test.
-    Chat    What can you do?    model=gpt-5-nano
+    Chat    What can you do?    model=openai:gpt-5-nano
     ${messages}    Get Message History
     Log    ${messages}
 

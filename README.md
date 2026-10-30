@@ -33,7 +33,7 @@ The examples found under `examples/` are illustrative only; they are not project
 
 ## Compatibility
 
-- Python: >= 3.10
+- Python: >= 3.11
 - Robot Framework: >= 7.0
 
 ## Installation
@@ -76,12 +76,12 @@ Minimal hello and per-step model override.
 
 ```robot
 *** Settings ***
-Library    AIAgent.Agent    gpt-5-chat-latest
+Library    AIAgent.Agent    openai:gpt-5-chat-latest
 
 *** Test Cases ***
 Say Hello
   Chat    Hello, I am a Robot Framework test.
-  Chat    What can you do?    model=google-gla:gemini-2.5-flash-lite
+  Chat    What can you do?    model=google:gemini-2.5-flash-lite
 ```
 
 ## Provider credentials

@@ -10,7 +10,7 @@ Library    AIAgent
 Library    AIAgent
 ...        output_type=${{ dataclasses.make_dataclass('Verdict', [('ok', bool), ('reason', str)]) }}
 ...        AS    Judge
-Library    AIAgent    gpt-5-nano    AS    Reporter
+Library    AIAgent    openai:gpt-5-nano    AS    Reporter
 
 *** Test Cases ***
 Chain Of Responsibility

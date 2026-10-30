@@ -8,11 +8,11 @@ version = "0.3.0"
 description = "A Robot Framework library for AI agents"
 readme = "README.md"
 authors = [{ name = "Daniel Biehl", email = "dbiehl@live.de" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 dependencies = [
-    "robotframework-aiagent-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]==0.3.0",
+    "robotframework-aiagent-slim[openai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]==0.3.0",
 ]
 
 [project.optional-dependencies]
@@ -24,10 +24,11 @@ Changelog = "https://github.com/d-biehl/robotframework-aiagent/releases"
 
 [dependency-groups]
 dev = [
-    "commitizen>=4.13.5",
-    "debugpy>=1.8.16",
-    "mypy>=1.17.1",
-    "robotframework-robocop>=6.6.0",
+    "commitizen>=4.19.3",
+    "debugpy>=1.8.22",
+    "mypy>=2.4.1",
+    "robotframework-robocop>=9.1.2",
+    "ruff>=0.17.3",
 ]
 
 [tool.uv]
@@ -47,7 +48,7 @@ module-name = []
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 include = [
     "packages/**/*.py",
     "examples/**/*.py",
@@ -98,7 +99,7 @@ quote-style = "single"
 "docs/**/*.py" = ["D"]
 
 [tool.pyright]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 typeCheckingMode = "strict"
 reportMissingTypeStubs = false
 reportUnnecessaryIsInstance = false
@@ -113,7 +114,7 @@ venvPath = '.'
 venv = ".venv"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 warn_redundant_casts = true
 warn_unused_ignores = true

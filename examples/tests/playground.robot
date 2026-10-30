@@ -1,7 +1,7 @@
 *** Settings ***
-Library    AIAgent.Agent    gpt-5    name=RobotAgent   instructions=${INSTRUCTIONS}  toolsets=["playwright", "weather_toolset", "datetime_toolset"]    retries=3    output_retries=3
+Library    AIAgent.Agent    openai:gpt-5    name=RobotAgent   instructions=${INSTRUCTIONS}  toolsets=["playwright", "weather_toolset", "datetime_toolset"]    retries=3    output_retries=3
 Variables       AIAgent.Examples.PlaywrightMCP
-#Library         AIAgent.Agent    gpt-5-mini    instructions=${INSTRUCTIONS}    toolsets=${{[$playwright]}}
+#Library         AIAgent.Agent    openai:gpt-5-mini    instructions=${INSTRUCTIONS}    toolsets=${{[$playwright]}}
 Variables    pydantic_ai.models.openai
 Variables    pydantic_ai.providers.openrouter
 Variables       pydantic_ai.providers.ollama

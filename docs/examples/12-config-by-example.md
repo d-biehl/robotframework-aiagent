@@ -5,7 +5,7 @@ Import-time defaults and overrides.
 ```robot
 *** Settings ***
 Library    AIAgent
-...        model=gpt-5-chat-latest
+...        model=openai:gpt-5-chat-latest
 ...        instructions=You are a helpful QA assistant.
 ...        system_prompt=Answer concisely.
 ...        output_type=${{ str }}

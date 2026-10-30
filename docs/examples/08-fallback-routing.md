@@ -4,7 +4,7 @@ Start fast/cheap; escalate if not confident.
 
 ```robot
 *** Settings ***
-Library    AIAgent    gpt-5-nano    AS    Fast
+Library    AIAgent    openai:gpt-5-nano    AS    Fast
 Library    AIAgent                 AS    Strong
 
 *** Test Cases ***

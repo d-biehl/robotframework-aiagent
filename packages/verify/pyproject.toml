@@ -7,7 +7,7 @@ name = "robotframework-aiagent-verify"
 version = "0.3.0"
 description = "LLM-as-judge verification keywords for robotframework-aiagent"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = ["robotframework-aiagent-slim==0.3.0"]
 

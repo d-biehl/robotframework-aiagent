@@ -4,9 +4,9 @@ Two answers; an arbiter chooses the best.
 
 ```robot
 *** Settings ***
-Library    AIAgent    gpt-5-nano          AS    A1
-Library    AIAgent    claude-sonnet-4-0   AS    A2
-Library    AIAgent    google-flash-2-4
+Library    AIAgent    openai:gpt-5-nano    AS    A1
+Library    AIAgent    anthropic:claude-sonnet-4-0    AS    A2
+Library    AIAgent    google:gemini-2.5-flash-lite
 ...        output_type=${{ dataclasses.make_dataclass('Choice', [('best', int), ('reason', str)]) }}
 ...        AS    Arbiter
 

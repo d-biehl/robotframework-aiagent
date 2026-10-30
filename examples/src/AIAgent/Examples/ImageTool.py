@@ -7,8 +7,6 @@ from pydantic_ai.toolsets import FunctionToolset
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
 
-client = OpenAI()
-
 
 def gen_image(
     prompt: str,
@@ -37,7 +35,8 @@ def gen_image(
         >>> gen_image("Minimal blue square logo", size="512x512", file_name_base="logo")
         ['logo_0.png']
     """
-    resp = client.images.generate(prompt=prompt, model='gpt-image-1', size='auto', output_format='png', n=n)
+    with OpenAI() as client:
+        resp = client.images.generate(prompt=prompt, model='gpt-image-1', size='auto', output_format='png', n=n)
 
     if not resp.data:
         raise ValueError('No image data returned from OpenAI')

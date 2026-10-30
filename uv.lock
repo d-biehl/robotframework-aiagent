@@ -13,6 +13,7 @@ members = [
     "robotframework-aiagent",
     "robotframework-aiagent-examples",
     "robotframework-aiagent-slim",
+    "robotframework-aiagent-verify",
 ]
 
 [[package]]
@@ -2750,6 +2751,16 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.14.0" },
 ]
 provides-extras = ["anthropic", "bedrock", "cohere", "duckduckgo", "google", "groq", "huggingface", "mcp", "mistral", "openai", "openrouter", "vertexai"]
+
+[[package]]
+name = "robotframework-aiagent-verify"
+source = { editable = "packages/verify" }
+dependencies = [
+    { name = "robotframework-aiagent-slim" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "robotframework-aiagent-slim", editable = "packages/slim" }]
 
 [[package]]
 name = "robotframework-robocop"

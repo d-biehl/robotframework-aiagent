@@ -14,7 +14,7 @@ The guides and the example suites in `examples/tests` are two unconnected worlds
 ## What Changes
 
 - Add a documentation site built with Astro, using the same toolchain and structure as robotframework-jsonrpcremote. A `docs.yml` workflow publishes it to GitHub Pages.
-- Establish the rule that **every guide is backed by a runnable suite in `examples/tests`**. Guides explain, suites prove. Guides embed or reference the suite instead of copying code, and the CI dry run from `add-offline-test-harness` covers every suite.
+- Establish the rule that **every guide is backed by a runnable suite in `examples/tests`**. Guides explain, suites prove. Guides embed or reference the suite instead of copying code, and the CI dry run from `add-offline-test-harness` covers every suite. A CI check fails when a guide references no suite, or a suite that does not exist.
 - **BREAKING** (docs only): replace `docs/examples` with a curated set of guides:
   - getting started and switching models per step
   - typed outputs and model settings
@@ -34,11 +34,11 @@ The guides and the example suites in `examples/tests` are two unconnected worlds
 
 ### New Capabilities
 
-None. This change covers documentation and examples only; no library behavior changes.
+- `documentation`: the published guides and how they stay correct. Every guide is backed by a runnable suite in `examples/tests`, and CI verifies that each guide references an existing suite and that the suite passes the dry run.
 
 ### Modified Capabilities
 
-None.
+None. There are no existing specs yet.
 
 ## Impact
 

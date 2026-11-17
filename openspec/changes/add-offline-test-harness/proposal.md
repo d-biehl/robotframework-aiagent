@@ -23,11 +23,12 @@ Nothing in the repository is verified automatically: the only workflow publishes
 
 ### New Capabilities
 
-None. This change adds test and CI infrastructure only; no library behavior changes.
+- `platform-support`: the Python versions and operating systems the packages support (Python 3.12 to 3.15 on Linux, macOS and Windows), each verified by the CI matrix.
+- `offline-verification`: the library's behavior can be verified without network access or API keys. Unit tests and offline suites run with test models, and every example suite passes a dry run. CI runs all of them.
 
 ### Modified Capabilities
 
-None.
+None. There are no existing specs yet.
 
 ## Impact
 

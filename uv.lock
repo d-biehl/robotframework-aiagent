@@ -4,8 +4,8 @@ requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.15'",
     "python_full_version == '3.14.*' and sys_platform == 'emscripten'",
-    "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'emscripten'",
     "python_full_version == '3.14.*' and sys_platform != 'emscripten'",
+    "python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'emscripten'",
     "python_full_version < '3.12' or (python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform != 'emscripten')",
 ]
 
@@ -2711,7 +2711,7 @@ wheels = [
 
 [[package]]
 name = "robotframework-aiagent"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "bedrock", "cohere", "google", "groq", "mcp", "mistral", "openai", "openrouter"] },
@@ -2751,7 +2751,7 @@ dev = [
 
 [[package]]
 name = "robotframework-aiagent-examples"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "examples" }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "mcp", "openai"] },
@@ -2762,7 +2762,7 @@ requires-dist = [{ name = "robotframework-aiagent-slim", extras = ["openai", "an
 
 [[package]]
 name = "robotframework-aiagent-slim"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "packages/slim" }
 dependencies = [
     { name = "pydantic-ai-slim" },
@@ -2826,7 +2826,7 @@ provides-extras = ["openai", "cohere", "google", "anthropic", "groq", "mistral",
 
 [[package]]
 name = "robotframework-aiagent-verify"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "packages/verify" }
 dependencies = [
     { name = "robotframework-aiagent-slim" },

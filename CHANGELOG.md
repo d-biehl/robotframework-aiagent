@@ -1,3 +1,36 @@
+## v0.4.0 (2026-11-17)
+
+### BREAKING CHANGE
+
+- Python 3.10 is no longer supported, the vertexai extra
+is gone and model names need a provider prefix (e.g. openai:gpt-5-mini).
+The openai: prefix now uses the OpenAI Responses API.
+
+### Feat
+
+- **agent**: log tool calls, usage and images in a readable way
+- **content**: keep loaded files short in Robot's argument log
+- require Python 3.11 and upgrade to pydantic-ai v2
+- **verify**: add LLM-as-judge verification package
+
+### Fix
+
+- **agent**: log a text answer only once
+- **examples**: keep files the Playwright agent saves in the output dir
+- **verify**: drop the implicit temperature default
+- **agent**: keep pydantic-ai's first-run banner out of the console
+- **examples**: pass the requested image size to the API
+- **examples**: generate images with gpt-image-2
+- **examples**: start a fresh Playwright MCP server per test
+- **agent**: log output tool calls with pydantic-ai v2
+- **examples**: create the OpenAI client lazily in ImageTool
+- **agent**: do not swallow exceptions from failed agent runs
+
+### Refactor
+
+- **agent**: leave the estimated cost out of the usage line
+- **agent**: extract AgentRunner core and migrate to pydantic-ai capabilities API
+
 ## v0.3.0 (2026-02-09)
 
 ### Feat

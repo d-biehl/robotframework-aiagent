@@ -172,6 +172,17 @@ Within that scope, useful scenarios include:
   - Useful for adversarial prompts, policy reviews, or role-play testing.
   - Distribute steps across specialized agents and keep per-agent histories isolated within a test.
 
+## What gets logged
+
+Every `Chat` writes its course into the Robot Framework log:
+
+- The model's answer, its thinking (folded away) and structured outputs as JSON.
+- Tool calls and their results. Long results are cut down and logged completely as DEBUG.
+- Retries with their reason, e.g. a tool asking for another attempt or an output that failed validation.
+- A usage line: requests, tool calls, tokens, the answering model and an estimated cost.
+- Images and other files from prompts, tool results (e.g. browser screenshots) and model output are stored in an
+  `aiagent` folder of the output directory and shown as previews instead of being written into the log.
+
 ## Roadmap / Upcoming features
 
 Planned or potential additions based on the current design and dependencies:

@@ -5,7 +5,7 @@ import importlib.metadata
 import logging
 import threading
 from collections.abc import Iterator, Sequence
-from typing import TYPE_CHECKING, Any, Generic, cast, get_args
+from typing import TYPE_CHECKING, Any, Generic, Literal, cast, get_args
 
 if TYPE_CHECKING:
     from pydantic_ai._agent_graph import AgentNode
@@ -18,6 +18,8 @@ from pydantic_ai import (
     FinalResultEvent,
     NativeToolCallPart,
     NativeToolReturnPart,
+    OutputToolCallEvent,
+    OutputToolResultEvent,
     PartDeltaEvent,
     PartEndEvent,
     PartStartEvent,
@@ -40,6 +42,15 @@ from pydantic_ai.models import KnownModelName as PydanticKnownModelName
 from robot.api import logger
 from typing_extensions import TypeAliasType
 
+from .log_format import (
+    ContentRenderer,
+    LogMessage,
+    collapsible,
+    contains_media,
+    retry_note,
+    truncate,
+    usage_summary,
+)
 from .plugin_manager import PluginManager
 
 try:
@@ -59,12 +70,19 @@ def _disable_debug_logging() -> None:
     logging.getLogger('httpx').propagate = True
     logging.getLogger('httpx').setLevel(logging.CRITICAL)
     logging.getLogger('httpx').propagate = True
+    # every test starts a new event loop, keep its "Using selector" debug message out of the log
+    logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 
 _disable_debug_logging()
 
 # Robot Framework owns the console, keep pydantic-ai's first-run banner out of it
 pydantic_ai.BANNER_ENABLED = False
+
+# tool arguments and results longer than this are cut off in the INFO line and logged completely as DEBUG
+_TOOL_TEXT_LIMIT = 1000
+# length of the tool call repeated in front of its result
+_CALL_LABEL_LIMIT = 120
 
 
 def _get_literal_vals(alias: TypeAliasType) -> frozenset[Any]:
@@ -182,6 +200,7 @@ class AgentRunner(Generic[output.OutputDataT]):
         self._agent_thread: threading.Thread | None = None
         self._agent_loop: asyncio.AbstractEventLoop | None = None
         self._robot_loop: asyncio.AbstractEventLoop | None = None
+        self._renderer = ContentRenderer()
 
         self._agent_loop_stop: threading.Event | None = None
         self._agent_loop_running: threading.Event | None = None
@@ -284,8 +303,7 @@ class AgentRunner(Generic[output.OutputDataT]):
         """Log agent nodes with different log levels based on node type.
 
         Uses runtime type guards to determine the specific node type and route to appropriate loggers.
-        End nodes with string output are logged as INFO, representing the final agent result, unless
-        that string is just the final response's text, which is already logged as it completes.
+        End nodes log the run's output and usage, see `_log_result`.
 
         Args:
             node: Agent graph node (UserPromptNode, ModelRequestNode, CallToolsNode, or End)
@@ -301,16 +319,34 @@ class AgentRunner(Generic[output.OutputDataT]):
         elif agent.Agent.is_call_tools_node(node):
             await self._log_tool_calls(node, agent_run)
         elif hasattr(node, 'data') and hasattr(getattr(node, 'data', None), 'output'):
-            # End node with FinalResult - log a string output, unless it is just the text of the final
-            # response, which was already logged when its text part completed
-            final_result = cast('FinalResult[Any]', getattr(node, 'data'))
-            if isinstance(final_result.output, str) and final_result.output != self._last_response_text(agent_run):
-                self._robot_loop.call_soon_threadsafe(logger.info, final_result.output)
+            self._log_result(cast('FinalResult[Any]', getattr(node, 'data')), agent_run)
         else:
             # Log unknown node types to detect unexpected graph nodes
-            self._robot_loop.call_soon_threadsafe(
-                logger.debug, f'Unknown node type encountered: {type(node).__name__} - {node!r}'
-            )
+            self._log(f'Unknown node type encountered: {type(node).__name__} - {node!r}', 'DEBUG')
+
+    def _log(self, message: str | LogMessage, level: Literal['DEBUG', 'INFO'] = 'INFO') -> None:
+        """Hand a message over to Robot Framework's thread, which owns the log."""
+        if self._robot_loop is None:
+            return
+        if isinstance(message, str):
+            message = LogMessage(message)
+        self._robot_loop.call_soon_threadsafe(functools.partial(logger.write, message.message, level, message.html))
+
+    def _log_result(self, final_result: 'FinalResult[Any]', agent_run: run.AgentRun[output.OutputDataT, Any]) -> None:
+        """Log the output and the usage of a finished run.
+
+        A string output that is just the final response's text was already logged when its text part
+        completed. Other outputs are logged as JSON, binary outputs such as images as a preview.
+        """
+        result = final_result.output
+        if isinstance(result, str):
+            if result != self._last_response_text(agent_run):
+                self._log(result)
+        else:
+            self._log(self._renderer.render(result, prefix='Result: ', indent=2))
+
+        responses = (message for message in agent_run.new_messages() if isinstance(message, messages.ModelResponse))
+        self._log(usage_summary(agent_run.usage, responses))
 
     @staticmethod
     def _last_response_text(agent_run: run.AgentRun[output.OutputDataT, Any]) -> str | None:
@@ -319,15 +355,18 @@ class AgentRunner(Generic[output.OutputDataT]):
         return last.text if isinstance(last, messages.ModelResponse) else None
 
     def _log_user_prompt(self, node: 'AgentNode[Any, Any]') -> None:
-        """Log user prompt as DEBUG.
+        """Log the user prompt, as DEBUG for plain text and as INFO with previews if it carries files.
 
         Args:
             node: UserPromptNode with user_prompt attribute
         """
-        if self._robot_loop is not None:
-            # Access user_prompt attribute dynamically
-            user_prompt_text = getattr(node, 'user_prompt', str(node))
-            self._robot_loop.call_soon_threadsafe(logger.debug, f'User prompt: {user_prompt_text!r}')
+        user_prompt = getattr(node, 'user_prompt', None)
+        if user_prompt is None:
+            return
+        self._log(
+            self._renderer.render(user_prompt, prefix='User prompt: '),
+            'INFO' if contains_media(user_prompt) else 'DEBUG',
+        )
 
     async def _log_model_request(
         self, node: 'AgentNode[Any, Any]', agent_run: run.AgentRun[output.OutputDataT, Any]
@@ -341,6 +380,8 @@ class AgentRunner(Generic[output.OutputDataT]):
         if self._robot_loop is None:
             return
 
+        self._log_retry_feedback(node)
+
         stream_method = getattr(node, 'stream', None)
         if stream_method is None:
             return
@@ -348,63 +389,52 @@ class AgentRunner(Generic[output.OutputDataT]):
         async with stream_method(agent_run.ctx) as request_stream:
             async for event in request_stream:
                 match event:
-                    case PartStartEvent():
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug, f'Request part {event.index} started: {event.part!r}'
-                        )
                     case PartEndEvent(part=ThinkingPart() as thinking_part):
-                        # Log ThinkingPart content as INFO with thinking marker (reasoning/thinking output)
-                        self._robot_loop.call_soon_threadsafe(logger.info, f'[THINKING] {thinking_part.content}')
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug, f'Request part {event.index} completed: {event.part!r}'
-                        )
+                        if thinking_part.content.strip():
+                            self._log(collapsible('Thinking', thinking_part.content))
                     case PartEndEvent(part=TextPart() as text_part):
-                        # Log TextPart content as INFO (final text response)
-                        self._robot_loop.call_soon_threadsafe(logger.info, text_part.content)
+                        self._log(text_part.content)
                     case PartEndEvent(part=FilePart() as file_part):
-                        # Log FilePart (multimodal content like images/documents) as INFO
-                        content_type = getattr(file_part.content, 'media_type', 'unknown')
-                        content_size = len(getattr(file_part.content, 'data', b''))
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.info,
-                            f'[FILE] Received {content_type} file ({content_size} bytes)'
-                            + (f' [id={file_part.id}]' if file_part.id else ''),
-                        )
+                        self._log(self._renderer.render(file_part.content, prefix='File from model: '))
                     case PartEndEvent(part=NativeToolCallPart() as tool_call):
-                        # Log native tool calls as DEBUG
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug,
+                        self._log(
                             f'Native tool call: {tool_call.tool_name}({tool_call.args}) [id={tool_call.tool_call_id}]',
+                            'DEBUG',
                         )
                     case PartEndEvent(part=NativeToolReturnPart() as tool_return):
-                        # Log native tool returns as DEBUG
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug,
-                            f'Native tool result [{tool_return.tool_call_id}]: {tool_return.content}',
-                        )
+                        prefix = f'Native tool result [{tool_return.tool_call_id}]: '
+                        self._log(self._renderer.render(tool_return.content, prefix=prefix), 'DEBUG')
+                    case PartEndEvent(part=messages.ToolCallPart()):
+                        pass  # logged when the tool is called
                     case PartEndEvent():
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug, f'Request part {event.index} completed: {event.part!r}'
-                        )
+                        self._log(f'Request part {event.index} completed: {event.part!r}', 'DEBUG')
                     case FinalResultEvent():
                         # Note: FinalResultEvent fires at the *start* of the final part, before the
                         # remaining text deltas arrive. Do NOT break here, otherwise the stream is
                         # abandoned early and the run result only contains the first chunk.
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug, f'Model producing final result (tool={event.tool_name})'
-                        )
-                    case PartDeltaEvent():
-                        pass  # Intentionally ignore delta events (streaming chunks)
+                        self._log(f'Model producing final result (tool={event.tool_name})', 'DEBUG')
+                    case PartStartEvent() | PartDeltaEvent():
+                        pass  # the completed part is logged instead
                     case _:
                         # Log unknown event types to detect unexpected model request events
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug, f'Unknown model request event: {type(event).__name__} - {event!r}'
-                        )
+                        self._log(f'Unknown model request event: {type(event).__name__} - {event!r}', 'DEBUG')
+
+    def _log_retry_feedback(self, node: 'AgentNode[Any, Any]') -> None:
+        """Log retries that answer no tool call, e.g. a text output that failed validation.
+
+        Args:
+            node: ModelRequestNode whose request carries the retry feedback
+        """
+        request = getattr(node, 'request', None)
+        for part in getattr(request, 'parts', ()):
+            if isinstance(part, messages.RetryFeedbackPart):
+                prefix = f'Retry{retry_note(part.retry)}: '
+                self._log(self._renderer.render(part.content, prefix=prefix, limit=_TOOL_TEXT_LIMIT))
 
     async def _log_tool_calls(
         self, node: 'AgentNode[Any, Any]', agent_run: run.AgentRun[output.OutputDataT, Any]
     ) -> None:
-        """Log tool calls and results as DEBUG.
+        """Log tool calls and their results as INFO, those of output tools as DEBUG.
 
         Args:
             node: CallToolsNode with stream() method
@@ -417,25 +447,61 @@ class AgentRunner(Generic[output.OutputDataT]):
         if stream_method is None:
             return
 
+        # calls by id, so that results of parallel calls of the same tool can be told apart
+        calls: dict[str, str] = {}
         async with stream_method(agent_run.ctx) as tool_stream:
             async for event in tool_stream:
                 match event:
-                    # base classes, so output tools (separate events since pydantic-ai v2) are logged too
+                    case OutputToolCallEvent():
+                        # the output itself is logged at the end of the run
+                        self._log(f'Output tool call: {event.part.tool_name}({event.part.args_as_json_str()})', 'DEBUG')
                     case ToolCallEvent():
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug,
-                            f'Tool call: {event.part.tool_name}({event.part.args}) [id={event.part.tool_call_id}]',
-                        )
+                        call = f'{event.part.tool_name}({event.part.args_as_json_str()})'
+                        calls[event.part.tool_call_id] = call
+                        text, truncated = truncate(f'Tool call: {call}', _TOOL_TEXT_LIMIT)
+                        self._log(text)
+                        if truncated:
+                            self._log(f'Tool call: {call} [id={event.part.tool_call_id}]', 'DEBUG')
                     case ToolResultEvent():
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug,
-                            f'Tool result [{event.tool_call_id}]: {event.part.content}',
-                        )
+                        call = calls.get(event.part.tool_call_id, event.part.tool_name)
+                        self._log_tool_result(event, truncate(call, _CALL_LABEL_LIMIT)[0])
                     case _:
                         # Log unknown event types to detect unexpected tool call events
-                        self._robot_loop.call_soon_threadsafe(
-                            logger.debug, f'Unknown tool call event: {type(event).__name__} - {event!r}'
-                        )
+                        self._log(f'Unknown tool call event: {type(event).__name__} - {event!r}', 'DEBUG')
+
+    def _log_tool_result(self, event: ToolResultEvent, call: str) -> None:
+        """Log a tool result, cut down and with previews of returned images.
+
+        Retries and failures are logged with their message. Successful results of output tools are only
+        logged as DEBUG, the run's output is logged at its end.
+
+        Args:
+            event: The tool result event
+            call: The tool call the result answers, e.g. `get_weather({"city":"Berlin"})`
+        """
+        part = event.part
+        content: Any = part.content
+        if extra := getattr(event, 'content', None):
+            # content sent to the model as a user prompt after the result, e.g. images for providers that
+            # can't take them in tool results
+            content = [content, *extra] if isinstance(extra, (list, tuple)) else [content, extra]
+
+        level: Literal['DEBUG', 'INFO'] = 'INFO'
+        match part.outcome:
+            case 'success':
+                label = f'Tool result: {call}'
+                if isinstance(event, OutputToolResultEvent):
+                    level = 'DEBUG'
+            case 'retried':
+                label = f'Tool retry: {call}{retry_note(part.retry)}'
+            case outcome:
+                label = f'Tool {outcome}: {call}'
+
+        message = self._renderer.render(content, prefix=f'{label}: ', limit=_TOOL_TEXT_LIMIT)
+        self._log(message, level)
+        if message.truncated:
+            prefix = f'{label} (complete, id={part.tool_call_id}): '
+            self._log(self._renderer.render(content, prefix=prefix, previews=False), 'DEBUG')
 
     def get_message_history(
         self, content: HistoryContent = HistoryContent.FULL, format: HistoryFormat = HistoryFormat.RAW
@@ -555,6 +621,8 @@ class AgentRunner(Generic[output.OutputDataT]):
         timeout: float | None = None,
     ) -> output.OutputDataT | None:
         self._robot_loop = asyncio.get_event_loop()
+        # resolved here, in Robot Framework's thread, where the output directory is known
+        self._renderer = ContentRenderer.for_robot()
 
         try:
             return await asyncio.wait_for(

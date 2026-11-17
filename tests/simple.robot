@@ -2,14 +2,14 @@
 Variables       AIAgent.Models.OpenAI
 Variables       AIAgent.Models.OpenRouter
 Variables       AIAgent.Content
-# Library         AIAgent.Agent    openrouter:anthropic/claude-sonnet-4.5
-Library         AIAgent.Agent    ${OpenAIResponsesModel("${OPENAI_MODEL_GPT_5_2_PRO}")}
-...                 model_settings=${OPENAI_MODEL_SETTINGS}
+Library         AIAgent.Agent    openrouter:anthropic/claude-sonnet-5.5
+# Library         AIAgent.Agent    ${OpenAIResponsesModel("${OPENAI_MODEL_GPT_5_2_PRO}")}
+# ...                 model_settings=${OPENAI_MODEL_SETTINGS}
 # Library       AIAgent.Agent    ${OpenRouterModel("z-ai/glm-4.7")}
 # Library       AIAgent.Agent    anthropic:claude-sonnet-4-5
 # Library       AIAgent.Agent    github:openai/gpt-4.1
 # Library       AIAgent.Agent    ollama:glm-4.7-flash:latest
-...                 toolsets=${{["weather_toolset", "playwright"]}}
+# ...                 toolsets=${{["weather_toolset", "playwright"]}}
 
 
 *** Variables ***

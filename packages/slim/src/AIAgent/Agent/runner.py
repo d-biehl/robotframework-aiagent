@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import enum
 import functools
 import importlib.metadata
@@ -182,7 +183,7 @@ class AgentRunner(Generic[output.OutputDataT]):
         self._robot_loop: asyncio.AbstractEventLoop | None = None
         self._renderer = ContentRenderer()
 
-        self._agent_loop_stop: threading.Event | None = None
+        self._agent_loop_stop: asyncio.Event | None = None
         self._agent_loop_running: threading.Event | None = None
 
     def _build_tools(self) -> list[tools.Tool[Any]]:
@@ -510,11 +511,14 @@ class AgentRunner(Generic[output.OutputDataT]):
         Intended to be called from a Robot Framework library's `end_test` hook to
         prevent cross-test leakage.
         """
-        if self._agent_loop_stop is not None:
-            self._agent_loop_stop.set()
+        loop, stop = self._agent_loop, self._agent_loop_stop
+        if loop is not None and stop is not None:
+            # the stop event belongs to the agent loop, so it must be set from within that loop
+            with contextlib.suppress(RuntimeError):  # the loop has already shut down
+                loop.call_soon_threadsafe(stop.set)
 
         if self._agent_loop_running is not None:
-            self._agent_loop_running.wait(30)
+            self._agent_loop_running.wait(self._LOOP_TIMEOUT)
 
         self.clear_message_history()
 
@@ -564,15 +568,14 @@ class AgentRunner(Generic[output.OutputDataT]):
         """Run the agent event loop until stop is requested."""
         try:
             self._agent_loop_running = threading.Event()
-            self._agent_loop = asyncio.get_event_loop()
-            self._agent_loop_stop = threading.Event()
+            self._agent_loop = asyncio.get_running_loop()
+            self._agent_loop_stop = asyncio.Event()
 
             async with self._agent:
                 initialized_event.set()
 
                 # Keep the loop alive until stop is requested
-                while not self._agent_loop_stop.is_set():
-                    await asyncio.sleep(0.1)  # Slightly longer sleep to reduce CPU usage
+                await self._agent_loop_stop.wait()
         finally:
             # Clean up resources
             self._agent_loop = None

@@ -1,4 +1,3 @@
-import functools
 from collections.abc import Sequence
 from typing import Any, Generic, cast
 
@@ -13,7 +12,6 @@ from pydantic_ai import (
     usage,
 )
 from robot.api.deco import keyword, library
-from robot.api.interfaces import HybridLibrary
 from robot.result.model import TestCase as ResultTestCase
 from robot.running.model import TestCase as RunningTestCase
 
@@ -34,10 +32,10 @@ __all__ = ['Agent']
 @library(
     scope='TEST',
     version=__version__,
-    auto_keywords=True,
+    auto_keywords=False,
     listener='SELF',
 )
-class Agent(HybridLibrary, Generic[output.OutputDataT]):
+class Agent(Generic[output.OutputDataT]):
     """Robot Framework Library wrapper around pydantic-ai agents.
 
     This library exposes keywords for running model-backed chats and managing
@@ -130,36 +128,3 @@ class Agent(HybridLibrary, Generic[output.OutputDataT]):
             toolsets=toolsets,
             timeout=timeout,
         )
-
-    @functools.cached_property
-    def _static_keywords(self) -> Sequence[str]:
-        return [name for name in dir(self) if self._is_static_keyword(name)]
-
-    def _is_static_keyword(self, name: str) -> bool:
-        """Check if the given name is a keyword in this library."""
-        if name.startswith('_'):
-            return False
-
-        try:
-            o = object.__getattribute__(self, name)  # bypass __getattr__
-        except AttributeError:
-            return False
-
-        return callable(o) and hasattr(o, 'robot_name') and not hasattr(o, 'robot_not_keyword')
-
-    @functools.cached_property
-    def _all_keywords(self) -> Sequence[str]:
-        return self._static_keywords
-
-    def get_keyword_names(self) -> Sequence[str]:
-        return self._all_keywords
-
-    @functools.cached_property
-    def _modes(self) -> dict[str, Any]:
-        return {'ask': None}
-
-    def __getattr__(self, name: str) -> Any:
-        if name in self._modes:
-            return self._modes[name]
-
-        raise AttributeError(name)

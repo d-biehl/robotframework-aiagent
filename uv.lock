@@ -2711,7 +2711,7 @@ wheels = [
 
 [[package]]
 name = "robotframework-aiagent"
-version = "0.4.0"
+version = "0.4.1"
 source = { editable = "." }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "bedrock", "cohere", "google", "groq", "mcp", "mistral", "openai", "openrouter"] },
@@ -2751,7 +2751,7 @@ dev = [
 
 [[package]]
 name = "robotframework-aiagent-examples"
-version = "0.4.0"
+version = "0.4.1"
 source = { editable = "examples" }
 dependencies = [
     { name = "robotframework-aiagent-slim", extra = ["anthropic", "mcp", "openai"] },
@@ -2762,7 +2762,7 @@ requires-dist = [{ name = "robotframework-aiagent-slim", extras = ["openai", "an
 
 [[package]]
 name = "robotframework-aiagent-slim"
-version = "0.4.0"
+version = "0.4.1"
 source = { editable = "packages/slim" }
 dependencies = [
     { name = "pydantic-ai-slim" },
@@ -2826,7 +2826,7 @@ provides-extras = ["openai", "cohere", "google", "anthropic", "groq", "mistral",
 
 [[package]]
 name = "robotframework-aiagent-verify"
-version = "0.4.0"
+version = "0.4.1"
 source = { editable = "packages/verify" }
 dependencies = [
     { name = "robotframework-aiagent-slim" },

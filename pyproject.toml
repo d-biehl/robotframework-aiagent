@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "robotframework-aiagent"
-version = "0.4.0"
+version = "0.4.1"
 description = "A Robot Framework library for AI agents"
 readme = "README.md"
 authors = [{ name = "Daniel Biehl", email = "dbiehl@live.de" }]
@@ -12,11 +12,11 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 dependencies = [
-    "robotframework-aiagent-slim[openai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]==0.4.0",
+    "robotframework-aiagent-slim[openai,google,groq,anthropic,mistral,cohere,bedrock,openrouter,mcp]==0.4.1",
 ]
 
 [project.optional-dependencies]
-examples = ["robotframework-aiagent-examples==0.4.0"]
+examples = ["robotframework-aiagent-examples==0.4.1"]
 
 [project.urls]
 Source = "https://github.com/d-biehl/robotframework-aiagent"

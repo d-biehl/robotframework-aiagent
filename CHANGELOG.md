@@ -1,3 +1,11 @@
+## v0.4.1 (2026-11-18)
+
+### Refactor
+
+- **agent**: wait for the stop signal instead of polling
+- share one helper for reading Literal values
+- **agent**: drop the unused hybrid keyword machinery
+
 ## v0.4.0 (2026-11-17)
 
 ### BREAKING CHANGE

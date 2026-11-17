@@ -4,12 +4,12 @@ build-backend = "uv_build"
 
 [project]
 name = "robotframework-aiagent-verify"
-version = "0.4.0"
+version = "0.4.1"
 description = "LLM-as-judge verification keywords for robotframework-aiagent"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
-dependencies = ["robotframework-aiagent-slim==0.4.0"]
+dependencies = ["robotframework-aiagent-slim==0.4.1"]
 
 [tool.uv.sources]
 robotframework-aiagent-slim = { workspace = true }

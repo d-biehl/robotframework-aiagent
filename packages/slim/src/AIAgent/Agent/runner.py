@@ -284,7 +284,8 @@ class AgentRunner(Generic[output.OutputDataT]):
         """Log agent nodes with different log levels based on node type.
 
         Uses runtime type guards to determine the specific node type and route to appropriate loggers.
-        End nodes with string output are logged as INFO, representing the final agent result.
+        End nodes with string output are logged as INFO, representing the final agent result, unless
+        that string is just the final response's text, which is already logged as it completes.
 
         Args:
             node: Agent graph node (UserPromptNode, ModelRequestNode, CallToolsNode, or End)
@@ -300,15 +301,22 @@ class AgentRunner(Generic[output.OutputDataT]):
         elif agent.Agent.is_call_tools_node(node):
             await self._log_tool_calls(node, agent_run)
         elif hasattr(node, 'data') and hasattr(getattr(node, 'data', None), 'output'):
-            # End node with FinalResult - log output if it's a string
+            # End node with FinalResult - log a string output, unless it is just the text of the final
+            # response, which was already logged when its text part completed
             final_result = cast('FinalResult[Any]', getattr(node, 'data'))
-            if isinstance(final_result.output, str):
+            if isinstance(final_result.output, str) and final_result.output != self._last_response_text(agent_run):
                 self._robot_loop.call_soon_threadsafe(logger.info, final_result.output)
         else:
             # Log unknown node types to detect unexpected graph nodes
             self._robot_loop.call_soon_threadsafe(
                 logger.debug, f'Unknown node type encountered: {type(node).__name__} - {node!r}'
             )
+
+    @staticmethod
+    def _last_response_text(agent_run: run.AgentRun[output.OutputDataT, Any]) -> str | None:
+        all_messages = agent_run.all_messages()
+        last = all_messages[-1] if all_messages else None
+        return last.text if isinstance(last, messages.ModelResponse) else None
 
     def _log_user_prompt(self, node: 'AgentNode[Any, Any]') -> None:
         """Log user prompt as DEBUG.

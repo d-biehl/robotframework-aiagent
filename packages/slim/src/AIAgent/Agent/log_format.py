@@ -10,7 +10,6 @@ import mimetypes
 import os
 from collections.abc import Iterable
 from dataclasses import dataclass
-from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -87,7 +86,7 @@ def collapsible(summary: str, text: str) -> LogMessage:
 
 
 def usage_summary(run_usage: usage.RunUsage, responses: Iterable[messages.ModelResponse]) -> str:
-    """Summarize requests, tool calls, tokens, the answering models and the cost of an agent run."""
+    """Summarize requests, tool calls, tokens and the answering models of an agent run."""
     tokens_in = f'{run_usage.input_tokens:,} input tokens'
     if run_usage.cache_read_tokens:
         tokens_in += f' ({run_usage.cache_read_tokens:,} cached)'
@@ -102,8 +101,6 @@ def usage_summary(run_usage: usage.RunUsage, responses: Iterable[messages.ModelR
     models = list(dict.fromkeys(_model_label(response) for response in responses if response.model_name))
     if models:
         line += f'; model: {", ".join(models)}'
-    if run_usage.cost is not None:
-        line += f'; cost: {_format_cost(run_usage.cost)}'
     return line
 
 
@@ -236,9 +233,3 @@ def _model_label(response: messages.ModelResponse) -> str:
     if response.provider_name and response.provider_name != response.model_name:
         return f'{response.model_name} ({response.provider_name})'
     return str(response.model_name)
-
-
-def _format_cost(cost: Decimal) -> str:
-    if cost == 0:
-        return '$0'
-    return f'~${cost:.4f}' if cost >= Decimal('0.0001') else '<$0.0001'

@@ -179,7 +179,7 @@ Every `Chat` writes its course into the Robot Framework log:
 - The model's answer, its thinking (folded away) and structured outputs as JSON.
 - Tool calls and their results. Long results are cut down and logged completely as DEBUG.
 - Retries with their reason, e.g. a tool asking for another attempt or an output that failed validation.
-- A usage line: requests, tool calls, tokens, the answering model and an estimated cost.
+- A usage line: requests, tool calls, tokens and the answering model.
 - Images and other files from prompts, tool results (e.g. browser screenshots) and model output are stored in an
   `aiagent` folder of the output directory and shown as previews instead of being written into the log.
 
